@@ -13,19 +13,21 @@ public class Network {
 	int _numResourceTypes = 20;
 	int _maxEachTypePerAgent = 10;
 	int _maxEachTypePerTask = 5;
-	
+
 	public List<Task> TaskSet = new ArrayList<Task>();
 	public List<Resource> ResourceSet = new ArrayList<Resource>();
 	public List<Agent> AgentSet = new ArrayList<Agent>();
 	public List<Link> LinkSet = new ArrayList<Link>();
 
-	// private static Network instance = new Network();
-	//
-	// public static Network getInstance() {
-	// if (instance == null)
-	// instance = new Network();
-	// return instance;
-	// }
+	private static Network instance = new Network();
+	
+	private Network(){}
+
+	public static Network getInstance() {
+		if (instance == null)
+			instance = new Network();
+		return instance;
+	}
 
 	/*
 	 * @Override public String toString() { String s = ""; for (Link link :
@@ -138,7 +140,7 @@ public class Network {
 		return true;
 	}
 
-	private void print() {
+	public void print() {
 		// PRINTING ADJACENCY MATRIX
 		System.out.println("ADJACENCY MATRIX:");
 		System.out.println("=================");
@@ -158,7 +160,6 @@ public class Network {
 		}
 
 		// PRINTING RESOURCE ALLOCATION
-		
 
 		System.out.println("\n\nINITIAL RESOURCE ALLOCATION:");
 		System.out.println("============================");
@@ -170,8 +171,8 @@ public class Network {
 		for (Agent agent : AgentSet) {
 			System.out.printf("A%-4d", agent.getID());
 			for (Resource resource : ResourceSet) {
-				System.out.printf("%-5d", agent
-						.getResourceSetAgent(resource.getID()));
+				System.out.printf("%-5d",
+						agent.getResourceSetAgent(resource.getID()));
 			}
 			System.out.println();
 		}
@@ -179,34 +180,59 @@ public class Network {
 		// PRINT TASK LOCATIONS
 		System.out.println("\n\nTASK LOCATIONS:");
 		System.out.println("===================");
-		
+
 		for (Agent agent : AgentSet) {
-			System.out.print("A"+agent.getID()+": ");
-			for (Task task: agent.getTaskSetAgent()){
-				System.out.print("t"+ task.getID()+" ");
+			System.out.print("A" + agent.getID() + ": ");
+			for (Task task : agent.getTaskSetAgent()) {
+				System.out.print("t" + task.getID() + " ");
 			}
 			System.out.println();
 		}
-		
+
 		// PRINT TASK REQUIREMENTS
 		System.out.println("\n\nTASK REQUIREMENTS:");
 		System.out.println("======================");
 		for (Task task : TaskSet) {
-			System.out.print("t"+ task.getID()+": ");
+			System.out.print("t" + task.getID() + ": ");
 			for (Resource resource : ResourceSet) {
-				System.out.print(task.getRequiredResources(resource.getID())+"*R"+resource.getID()+" ");
+				System.out.print(task.getRequiredResources(resource.getID())
+						+ "*R" + resource.getID() + " ");
 			}
 			System.out.println();
 		}
 	}
 
-	boolean saveNetwork() {
+	public boolean saveNetwork(String file) throws FileNotFoundException,
+			UnsupportedEncodingException {
+		if (!file.endsWith(".txt")) {
+			file = file + ".txt";
+		}
+		PrintWriter writer = new PrintWriter(file, "UTF-8");
+		writer.println("#Agents: " + this.AgentSet.size());
+		writer.println("#Resource: " + this.ResourceSet.size());
+		writer.println("#Tasks: " + this.TaskSet.size());
+		writer.println("#########################################");
+		for (Agent agent : this.AgentSet) {
+			writer.println("A" + agent.getID() + ":");
+			writer.println("NEIGHBOURS:");
+			for (Agent agent2 : agent.getNeighbors())
+				writer.print("A" + agent2.getID() + " ");
+			writer.println("RESOURCES:");
+			for (Resource resource : this.ResourceSet)
+				writer.print(agent.getResourceSetAgent(resource.getID()) + "*R"
+						+ resource.getID() + " ");
+			writer.println("TASKS:");
+			for (Task task : agent.getTaskSetAgent())
+				writer.print("T" + task.getID() + " ");
+		}
+
+		writer.close();
 		return true;
 	}
 
-	boolean loadNetwork() {
+	public Network loadNetwork() {
 
-		return true;
+		return this;
 	}
 
 }
