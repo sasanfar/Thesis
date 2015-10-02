@@ -17,7 +17,7 @@ public class Network {
 	public List<Task> TaskSet = new ArrayList<Task>();
 	public List<Resource> ResourceSet = new ArrayList<Resource>();
 	public List<Agent> AgentSet = new ArrayList<Agent>();
-	public List<Link> LinkSet = new ArrayList<Link>();
+//	public List<Link> LinkSet = new ArrayList<Link>();
 
 	private static Network instance = new Network();
 	
@@ -208,31 +208,47 @@ public class Network {
 			file = file + ".txt";
 		}
 		PrintWriter writer = new PrintWriter(file, "UTF-8");
-		writer.println("#Agents: " + this.AgentSet.size());
-		writer.println("#Resource: " + this.ResourceSet.size());
-		writer.println("#Tasks: " + this.TaskSet.size());
+		writer.println("#Agents: " + this._numAgents);
+		writer.println("#Resource: " + this._numResourceTypes);
+		writer.println("#Tasks: " + this._numTasks);
 		writer.println("#########################################");
+		writer.println("Agents:");
 		for (Agent agent : this.AgentSet) {
 			writer.println("A" + agent.getID() + ":");
 			writer.println("NEIGHBOURS:");
 			for (Agent agent2 : agent.getNeighbors())
 				writer.print("A" + agent2.getID() + " ");
+			writer.println();
 			writer.println("RESOURCES:");
 			for (Resource resource : this.ResourceSet)
 				writer.print(agent.getResourceSetAgent(resource.getID()) + "*R"
 						+ resource.getID() + " ");
+			writer.println();
 			writer.println("TASKS:");
 			for (Task task : agent.getTaskSetAgent())
 				writer.print("T" + task.getID() + " ");
+		}
+		writer.println("#########################################");
+		writer.println("Tasks:");
+		for (Task task : TaskSet){
+			for (Resource resource: ResourceSet)
+				writer.print(task.getRequiredResources(resource.getID())+"*R"+ resource.getID()+ " ");
+			writer.println();
 		}
 
 		writer.close();
 		return true;
 	}
 
-	public Network loadNetwork() {
-
-		return this;
+	public boolean loadNetwork(String file) {
+		this.AgentSet.clear();
+		this.TaskSet.clear();
+		this.ResourceSet.clear();
+		
+		
+		this._maxEachTypePerAgent=0;
+		
+		return true;
 	}
 
 }
