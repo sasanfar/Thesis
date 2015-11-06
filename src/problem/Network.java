@@ -8,20 +8,15 @@ import java.io.*;
 
 public class Network {
 
-	int _numAgents = 100;
-	int _numTasks = 50;
-	int _numResourceTypes = 20;
-	int _maxEachTypePerAgent = 10;
-	int _maxEachTypePerTask = 5;
-
 	public List<Task> TaskSet = new ArrayList<Task>();
 	public List<Resource> ResourceSet = new ArrayList<Resource>();
 	public List<Agent> AgentSet = new ArrayList<Agent>();
-//	public List<Link> LinkSet = new ArrayList<Link>();
+	public List<Link> LinkSet = new ArrayList<Link>();
 
 	private static Network instance = new Network();
-	
-	private Network(){}
+
+	private Network() {
+	}
 
 	public static Network getInstance() {
 		if (instance == null)
@@ -29,60 +24,32 @@ public class Network {
 		return instance;
 	}
 
-	/*
-	 * @Override public String toString() { String s = ""; for (Link link :
-	 * Links) {
-	 * 
-	 * s += link.get_firstNode() + "->" + link.getSecondNode()+ " \n"; } return
-	 * s; }
-	 */
+	public boolean initializeNetwork(int numAgents, int numTasks,
+			int numResourceTypes, int maxEachTypePerAgent,
+			int maxEachTypePerTask) {
 
-	public boolean initializeNetwork() {
-
-		// The size of the problem
-		// BufferedReader br = new BufferedReader(new
-		// InputStreamReader(System.in));
-		// System.out.println("Insert the number of agents");
-		// try {
-		// _numAgents = br.read();
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
-		// System.out.println("Insert the total number of tasks");
-		// try {
-		// _numTasks = br.read();
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
-		// System.out.println("Insert the total number of resource types");
-		// try {
-		// _numResourceTypes = br.read();
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
-
-		if (_numAgents <= 0 || _numResourceTypes <= 0 || _numTasks <= 0) {
+		if (numAgents <= 0 || numResourceTypes <= 0 || numTasks <= 0) {
 			System.out.println("Error in inputs!");
-			return false; // return "FALSE"
+			return false;
 		}
 
 		// Building the network randomly
 		// adding resources
-		for (int id = 0; id < _numResourceTypes; id++) {
+		for (int id = 0; id < numResourceTypes; id++) {
 			Resource r = new Resource(id);
 			ResourceSet.add(r);
 		}
 
 		// adding agents
-		for (int id = 0; id < _numAgents; id++) {
-			Agent a = new Agent(id, _numResourceTypes);
+		for (int id = 0; id < numAgents; id++) {
+			Agent a = new Agent(id, numResourceTypes);
 			AgentSet.add(a);
 		}
 
 		// adding tasks and locating them
-		for (int id = 0; id < _numTasks; id++) {
-			Task t = new Task(id, _numResourceTypes);
-			int a = (int) (Math.random() * _numAgents);
+		for (int id = 0; id < numTasks; id++) {
+			Task t = new Task(id, numResourceTypes);
+			int a = (int) (Math.random() * numAgents);
 			t.setLocation(AgentSet.get(a));
 			AgentSet.get(a).setTaskSetAgent(t);
 			t.setUtility((int) (Math.random() * 1000));
@@ -111,15 +78,15 @@ public class Network {
 				}
 			}
 		}
-		if (LinkSet.size() < _numAgents - 1)
-			return false; // return "FALSE" if smaller than a tree
+		if (LinkSet.size() < numAgents - 1)
+			return false; // return "FALSE" if SMALLER than a TREE
 
 		// assigning resources to agents
 		for (Resource r : ResourceSet) {
 			for (Agent a : AgentSet) {
 				if (Math.random() >= 0.5) {
 					a.setResourceSetAgent(
-							(int) (Math.random() * _maxEachTypePerAgent), r);
+							(int) (Math.random() * maxEachTypePerAgent), r);
 					r.setLocation(a);
 				}
 			}
@@ -130,12 +97,10 @@ public class Network {
 			for (Task t : TaskSet) {
 				if (Math.random() >= 0.5) {
 					t.setRequiredResources(
-							(int) (Math.random() * _maxEachTypePerTask), r);
+							(int) (Math.random() * maxEachTypePerTask), r);
 				}
 			}
 		}
-
-		print();
 
 		return true;
 	}
@@ -145,13 +110,14 @@ public class Network {
 		System.out.println("ADJACENCY MATRIX:");
 		System.out.println("=================");
 		System.out.print("    ");
-		for (int i = 0; i < _numAgents; i++)
-			System.out.printf("A%-4d", i);
+		for (Agent agent : AgentSet)
+			System.out.printf("A%-4d", agent.getID());
 		System.out.println();
-		for (int i = 0; i < _numAgents; i++) {
-			System.out.printf("A%-4d", i);
-			for (int j = 0; j < _numAgents; j++) {
-				if (AgentSet.get(i).isNeighbor(AgentSet.get(j)))
+		for (Agent agent : AgentSet) {
+			System.out.printf("A%-4d", agent.getID());
+			for (Agent agent2 : AgentSet) {
+				if (AgentSet.get(agent.getID()).isNeighbor(
+						AgentSet.get(agent2.getID())))
 					System.out.printf("%-5d", 1);
 				else
 					System.out.printf("%-5d", 0);
@@ -182,7 +148,7 @@ public class Network {
 		System.out.println("===================");
 
 		for (Agent agent : AgentSet) {
-			System.out.print("A" + agent.getID() + ": ");
+			System.out.printf("A%-4d: " ,agent.getID() );
 			for (Task task : agent.getTaskSetAgent()) {
 				System.out.print("t" + task.getID() + " ");
 			}
@@ -193,7 +159,7 @@ public class Network {
 		System.out.println("\n\nTASK REQUIREMENTS:");
 		System.out.println("======================");
 		for (Task task : TaskSet) {
-			System.out.print("t" + task.getID() + ": ");
+			System.out.printf("t%-4d: ", task.getID() );
 			for (Resource resource : ResourceSet) {
 				System.out.print(task.getRequiredResources(resource.getID())
 						+ "*R" + resource.getID() + " ");
@@ -208,47 +174,58 @@ public class Network {
 			file = file + ".txt";
 		}
 		PrintWriter writer = new PrintWriter(file, "UTF-8");
-		writer.println("#Agents: " + this._numAgents);
-		writer.println("#Resource: " + this._numResourceTypes);
-		writer.println("#Tasks: " + this._numTasks);
+		writer.println("#Agents: " + this.AgentSet.size());
+		writer.println("#Resource: " + this.ResourceSet.size());
+		writer.println("#Tasks: " + this.TaskSet.size());
 		writer.println("#########################################");
-		writer.println("Agents:");
 		for (Agent agent : this.AgentSet) {
 			writer.println("A" + agent.getID() + ":");
 			writer.println("NEIGHBOURS:");
 			for (Agent agent2 : agent.getNeighbors())
 				writer.print("A" + agent2.getID() + " ");
-			writer.println();
 			writer.println("RESOURCES:");
 			for (Resource resource : this.ResourceSet)
 				writer.print(agent.getResourceSetAgent(resource.getID()) + "*R"
 						+ resource.getID() + " ");
-			writer.println();
 			writer.println("TASKS:");
 			for (Task task : agent.getTaskSetAgent())
 				writer.print("T" + task.getID() + " ");
-		}
-		writer.println("#########################################");
-		writer.println("Tasks:");
-		for (Task task : TaskSet){
-			for (Resource resource: ResourceSet)
-				writer.print(task.getRequiredResources(resource.getID())+"*R"+ resource.getID()+ " ");
-			writer.println();
 		}
 
 		writer.close();
 		return true;
 	}
 
-	public boolean loadNetwork(String file) {
-		this.AgentSet.clear();
-		this.TaskSet.clear();
-		this.ResourceSet.clear();
+	public static Network loadNetwork(String file)
+			{
+		instance = new Network();
+		int numAgents, numTasks, numResourceTypes, maxEachTypePerAgent, maxEachTypePerTask;
+		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+			StringBuilder sb = new StringBuilder();
+			String line = br.readLine();
+
+			while (line != null) {
+				sb.append(line);
+				sb.append(System.lineSeparator());
+				try {
+					line = br.readLine();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			String everything = sb.toString();
+			
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			System.out.println("File not found!");
+			e1.printStackTrace();
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} 
 		
-		
-		this._maxEachTypePerAgent=0;
-		
-		return true;
+		return instance;
 	}
 
 }

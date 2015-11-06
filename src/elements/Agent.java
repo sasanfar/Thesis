@@ -50,4 +50,9 @@ public class Agent {
 		}
 		return false;
 	}
+
+	public int[] getResourceSetAgent() {
+		// TODO Auto-generated method stub
+		return this.ResourceSetAgent;
+	}
 }

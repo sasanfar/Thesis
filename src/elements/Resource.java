@@ -2,7 +2,6 @@ package elements;
 
 public class Resource {
 	int ID;
-	//int quantity;
 	Agent location;
 
 	public Agent getLocation() {
