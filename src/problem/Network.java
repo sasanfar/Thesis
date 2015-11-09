@@ -4,6 +4,7 @@ import elements.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.io.*;
 
 public class Network {
@@ -21,6 +22,16 @@ public class Network {
 	public static Network getInstance() {
 		if (instance == null)
 			instance = new Network();
+		return instance;
+	}
+
+	public static Network newNetwork() {
+		if (instance == null)
+			instance = new Network();
+		else {
+			Network newNetwork = new Network();
+			instance = newNetwork;
+		}
 		return instance;
 	}
 
@@ -148,7 +159,7 @@ public class Network {
 		System.out.println("===================");
 
 		for (Agent agent : AgentSet) {
-			System.out.printf("A%-4d: " ,agent.getID() );
+			System.out.printf("A%-4d: ", agent.getID());
 			for (Task task : agent.getTaskSetAgent()) {
 				System.out.print("t" + task.getID() + " ");
 			}
@@ -159,7 +170,7 @@ public class Network {
 		System.out.println("\n\nTASK REQUIREMENTS:");
 		System.out.println("======================");
 		for (Task task : TaskSet) {
-			System.out.printf("t%-4d: ", task.getID() );
+			System.out.printf("t%-4d: ", task.getID());
 			for (Resource resource : ResourceSet) {
 				System.out.print(task.getRequiredResources(resource.getID())
 						+ "*R" + resource.getID() + " ");
@@ -177,6 +188,7 @@ public class Network {
 		writer.println("#Agents: " + this.AgentSet.size());
 		writer.println("#Resource: " + this.ResourceSet.size());
 		writer.println("#Tasks: " + this.TaskSet.size());
+		writer.println("#Types per Task: "+this.);
 		writer.println("#########################################");
 		for (Agent agent : this.AgentSet) {
 			writer.println("A" + agent.getID() + ":");
@@ -196,35 +208,48 @@ public class Network {
 		return true;
 	}
 
-	public static Network loadNetwork(String file)
-			{
-		instance = new Network();
+	public static Network loadNetwork(String fileLocation) {
+		Network loaded = new Network();
 		int numAgents, numTasks, numResourceTypes, maxEachTypePerAgent, maxEachTypePerTask;
-		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-			StringBuilder sb = new StringBuilder();
-			String line = br.readLine();
+		File file = new File(fileLocation);
 
-			while (line != null) {
-				sb.append(line);
-				sb.append(System.lineSeparator());
-				try {
-					line = br.readLine();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+		try {
+			Scanner sc = new Scanner(file);
+			numAgents = sc.nextInt();
+			numResourceTypes = sc.nextInt();
+			numTasks = sc.nextInt();
+
+			// / Build Agents
+			for (int i = 0; i < numAgents; i++) {
+				Agent a = new Agent(i, numResourceTypes);
+				loaded.AgentSet.add(a);
 			}
-			String everything = sb.toString();
-			
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			System.out.println("File not found!");
-			e1.printStackTrace();
-		} catch (IOException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		} 
-		
+			for (int i = 0; i < numTasks; i++) {
+				Task t = new Task(i, numResourceTypes);
+				loaded.TaskSet.add(t);
+			}
+			for (int i = 0; i < numAgents; i++) {
+				Agent a = new Agent(i, numResourceTypes);
+				loaded.AgentSet.add(a);
+			}
+			while (sc.hasNextLine()) {
+				// Neighbors
+				int tempAgent = sc.nextInt();
+				while (!sc.next().contains("RESOURCES:")) {
+					int neighboringAgent = sc.nextInt();
+					loaded.AgentSet.get(tempAgent).setNeighbor(
+							loaded.AgentSet.get(neighboringAgent));
+				}
+				// Resources
+				int _resource;
+				int _quantity;
+
+			}
+			sc.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
 		return instance;
 	}
 

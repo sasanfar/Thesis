@@ -1,6 +1,5 @@
 package user_interface;
 
-
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
@@ -56,22 +55,21 @@ public class Interface {
 		command = keyboard.nextLine();
 		command = command.toLowerCase();
 		switch (command) {
-		// case "n": {
-		// System.out
-		// .println("Put in number of agents, number of tasks, number of resource types, max of each type per agent, max of each type per task:");
-		// int _numAgents, _numTasks, _numResourceTypes, _maxEachTypePerAgent,
-		// _maxEachTypePerTask;
-		// _numAgents = keyboard.nextInt();
-		// _numTasks = keyboard.nextInt();
-		// _numResourceTypes = keyboard.nextInt();
-		// _maxEachTypePerAgent = keyboard.nextInt();
-		// _maxEachTypePerTask = keyboard.nextInt();
-		//
-		// network.initializeNetwork(_numAgents, _numTasks, _numResourceTypes,
-		// _maxEachTypePerAgent, _maxEachTypePerTask);
-		// mapping(network);
-		// }
-		// break;
+		case "n": {
+			System.out
+					.println("Put in number of agents, number of tasks, number of resource types, max of each type per agent, max of each type per task:");
+			int _numAgents, _numTasks, _numResourceTypes, _maxEachTypePerAgent, _maxEachTypePerTask;
+			_numAgents = keyboard.nextInt();
+			_numTasks = keyboard.nextInt();
+			_numResourceTypes = keyboard.nextInt();
+			_maxEachTypePerAgent = keyboard.nextInt();
+			_maxEachTypePerTask = keyboard.nextInt();
+			network = Network.newNetwork();
+			network.initializeNetwork(_numAgents, _numTasks, _numResourceTypes,
+					_maxEachTypePerAgent, _maxEachTypePerTask);
+			mapping(network);
+		}
+			break;
 		case "p":
 			network.print();
 			break;
@@ -132,7 +130,7 @@ public class Interface {
 			System.out.println("Wrong input!");
 			keyboard.close();
 			break;
-		} 
+		}
 	}
 
 	public static void mapping(Network network) {

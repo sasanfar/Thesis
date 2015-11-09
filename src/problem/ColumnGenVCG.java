@@ -383,6 +383,10 @@ public class ColumnGenVCG {
 			private double time_start;
 			private double time_limit;
 
+			public void setResourceType(Resource r){
+				resourceType=r;
+			}
+			
 			public void main() {
 				try {
 					if (!aborted && hasIncumbent()) {
@@ -486,12 +490,11 @@ public class ColumnGenVCG {
 		}
 
 		public void updateReducedCost() {
-			// TODO Auto-generated method stub
+			
 
 		}
 
 		public void solve() {
-			// TODO Auto-generated method stub
 
 		}
 	}
