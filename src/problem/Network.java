@@ -1,13 +1,10 @@
 package problem;
 
 import elements.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.io.*;
 
-public class Network {
+public class Network implements java.io.Serializable {
 
 	public List<Task> TaskSet = new ArrayList<Task>();
 	public List<Resource> ResourceSet = new ArrayList<Resource>();
@@ -25,13 +22,13 @@ public class Network {
 		return instance;
 	}
 
-	public static Network newNetwork() {
-		if (instance == null)
-			instance = new Network();
-		else {
-			Network newNetwork = new Network();
-			instance = newNetwork;
-		}
+	public static Network newNetwork(int numAgents, int numTasks,
+			int numResourceTypes, int maxEachTypePerAgent,
+			int maxEachTypePerTask) {
+		instance = new Network();
+		instance.initializeNetwork( numAgents,  numTasks,
+				 numResourceTypes,  maxEachTypePerAgent,
+				 maxEachTypePerTask);
 		return instance;
 	}
 
@@ -83,7 +80,6 @@ public class Network {
 				if (a2 != a1 && !a1.isNeighbor(a2) && Math.random() >= 0.5) {
 					Link l = new Link(linkID, a1, a2);
 					linkID++;
-					a2.setNeighbor(a1);
 					a1.setNeighbor(a2);
 					LinkSet.add(l);
 				}
@@ -179,78 +175,137 @@ public class Network {
 		}
 	}
 
-	public boolean saveNetwork(String file) throws FileNotFoundException,
-			UnsupportedEncodingException {
-		if (!file.endsWith(".txt")) {
-			file = file + ".txt";
-		}
-		PrintWriter writer = new PrintWriter(file, "UTF-8");
-		writer.println("#Agents: " + this.AgentSet.size());
-		writer.println("#Resource: " + this.ResourceSet.size());
-		writer.println("#Tasks: " + this.TaskSet.size());
-		writer.println("#Types per Task: "+this.);
-		writer.println("#########################################");
-		for (Agent agent : this.AgentSet) {
-			writer.println("A" + agent.getID() + ":");
-			writer.println("NEIGHBOURS:");
-			for (Agent agent2 : agent.getNeighbors())
-				writer.print("A" + agent2.getID() + " ");
-			writer.println("RESOURCES:");
-			for (Resource resource : this.ResourceSet)
-				writer.print(agent.getResourceSetAgent(resource.getID()) + "*R"
-						+ resource.getID() + " ");
-			writer.println("TASKS:");
-			for (Task task : agent.getTaskSetAgent())
-				writer.print("T" + task.getID() + " ");
-		}
+	// public boolean saveNetwork(String file) throws FileNotFoundException,
+	// UnsupportedEncodingException {
+	// if (!file.endsWith(".txt")) {
+	// file = file + ".txt";
+	// }
+	// PrintWriter writer = new PrintWriter(file, "UTF-8");
+	// writer.println("#Agents: " + this.AgentSet.size());
+	// writer.println("#Resource: " + this.ResourceSet.size());
+	// writer.println("#Tasks: " + this.TaskSet.size());
+	// writer.println("#Types per Task: " + this.maxEachTypePerTask);
+	// writer.println("#########################################");
+	// for (Agent agent : this.AgentSet) {
+	// writer.println("A" + agent.getID() + ":");
+	// writer.println("NEIGHBOURS:");
+	// for (Agent agent2 : agent.getNeighbors())
+	// writer.print("A" + agent2.getID() + " ");
+	// writer.println("RESOURCES:");
+	// for (Resource resource : this.ResourceSet)
+	// writer.print(agent.getResourceSetAgent(resource.getID()) + "*R"
+	// + resource.getID() + " ");
+	// writer.println("TASKS:");
+	// for (Task task : agent.getTaskSetAgent())
+	// writer.print("T" + task.getID() + " ");
+	// }
+	//
+	// writer.close();
+	// return true;
+	// }
+	//
+	// public static Network loadNetwork(String fileLocation) {
+	// Network loaded = new Network();
+	//
+	// File file = new File(fileLocation);
+	//
+	// try {
+	// Scanner sc = new Scanner(file);
+	// loaded.numAgents = sc.nextInt();
+	// loaded.numResourceTypes = sc.nextInt();
+	// loaded.numTasks = sc.nextInt();
+	//
+	// loaded.readNetwork(sc.nextInt(),sc.nextInt(),sc.nextInt(),sc.nextInt(),sc.nextInt());
+	// while (sc.hasNextLine()) {
+	// // Neighbors
+	// int tempAgent = sc.nextInt();
+	// while (!sc.next().contains("RESOURCES:")) {
+	// int neighboringAgent = sc.nextInt();
+	// loaded.AgentSet.get(tempAgent).setNeighbor(
+	// loaded.AgentSet.get(neighboringAgent));
+	// }
+	// // Resources
+	// int _resource;
+	// int _quantity;
+	//
+	// }
+	// sc.close();
+	// } catch (FileNotFoundException e) {
+	// e.printStackTrace();
+	// }
+	//
+	// return instance;
+	// }
+	//
+	// public void readNetwork(int _numAgents, int _numTasks,
+	// int _numResourceTypes, int _maxEachTypePerAgent,
+	// int _maxEachTypePerTask) {
+	// this.numAgents = _numAgents;
+	// this.numTasks = _numTasks;
+	// this.numResourceTypes = _numResourceTypes;
+	// this.maxEachTypePerAgent = _maxEachTypePerAgent;
+	// this.maxEachTypePerTask = _maxEachTypePerTask;
+	//
+	// if (numAgents <= 0 || numResourceTypes <= 0 || numTasks <= 0) {
+	// System.out.println("Error in inputs!");
+	// }
+	//
+	// // Building the network randomly
+	// // adding resources
+	// for (int id = 0; id < numResourceTypes; id++) {
+	// Resource r = new Resource(id);
+	// ResourceSet.add(r);
+	// }
+	//
+	// // adding agents
+	// for (int id = 0; id < numAgents; id++) {
+	// Agent a = new Agent(id, numResourceTypes);
+	// AgentSet.add(a);
+	// }
+	//
+	// // adding tasks and locating them
+	// for (int id = 0; id < numTasks; id++) {
+	// Task t = new Task(id, numResourceTypes);
+	// TaskSet.add(t);
+	// }
+	// }
 
-		writer.close();
-		return true;
+	public boolean saveNetwork(String file) {
+		try {
+			FileOutputStream fileOut = new FileOutputStream(file);
+			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			out.writeObject(instance);
+			out.close();
+			fileOut.close();
+			System.out.printf("Serialized data is saved in:" + file);
+			return true;
+		} catch (IOException i) {
+			i.printStackTrace();
+			return false;
+		}
 	}
 
-	public static Network loadNetwork(String fileLocation) {
-		Network loaded = new Network();
-		int numAgents, numTasks, numResourceTypes, maxEachTypePerAgent, maxEachTypePerTask;
-		File file = new File(fileLocation);
-
+	public static void loadNetwork(String fileLocation) {
+		Network loaded = null;
 		try {
-			Scanner sc = new Scanner(file);
-			numAgents = sc.nextInt();
-			numResourceTypes = sc.nextInt();
-			numTasks = sc.nextInt();
+			FileInputStream fileIn = new FileInputStream("/tmp/employee.ser");
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+			loaded = (Network) in.readObject();
+			in.close();
+			fileIn.close();
 
-			// / Build Agents
-			for (int i = 0; i < numAgents; i++) {
-				Agent a = new Agent(i, numResourceTypes);
-				loaded.AgentSet.add(a);
-			}
-			for (int i = 0; i < numTasks; i++) {
-				Task t = new Task(i, numResourceTypes);
-				loaded.TaskSet.add(t);
-			}
-			for (int i = 0; i < numAgents; i++) {
-				Agent a = new Agent(i, numResourceTypes);
-				loaded.AgentSet.add(a);
-			}
-			while (sc.hasNextLine()) {
-				// Neighbors
-				int tempAgent = sc.nextInt();
-				while (!sc.next().contains("RESOURCES:")) {
-					int neighboringAgent = sc.nextInt();
-					loaded.AgentSet.get(tempAgent).setNeighbor(
-							loaded.AgentSet.get(neighboringAgent));
-				}
-				// Resources
-				int _resource;
-				int _quantity;
-
-			}
-			sc.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+		} catch (IOException i) {
+			i.printStackTrace();
+			return;
+		} catch (ClassNotFoundException c) {
+			System.out.println("Employee class not found");
+			c.printStackTrace();
+			return;
 		}
-
-		return instance;
+		if (loaded != null) {
+			loaded.print();
+			instance = loaded;
+		}
 	}
 
 }

@@ -35,15 +35,18 @@ public class Agent {
 		return Neighbors;
 	}
 
-	public void setNeighbor(Agent neighbour) {
-		Neighbors.add(neighbour);
+	public void setNeighbor(Agent neighbor) {
+		if (!Neighbors.contains(neighbor)) {
+			Neighbors.add(neighbor);
+			neighbor.setNeighbor(this);
+		}
 	}
 
 	public int getID() {
 		return ID;
 	}
-	
-	public boolean isNeighbor(Agent agent){
+
+	public boolean isNeighbor(Agent agent) {
 		for (Agent a : Neighbors) {
 			if (agent == a)
 				return true;

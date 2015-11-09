@@ -18,7 +18,7 @@ public class Interface {
 		boolean execute = true;
 		while (!network.initializeNetwork(80, 50, 20, 10, 5))
 			network.initializeNetwork(80, 50, 20, 10, 5);
-		mapping(network);
+		// mapping(network);
 		String command;
 		while (execute) {
 			System.out
@@ -64,10 +64,12 @@ public class Interface {
 			_numResourceTypes = keyboard.nextInt();
 			_maxEachTypePerAgent = keyboard.nextInt();
 			_maxEachTypePerTask = keyboard.nextInt();
-			network = Network.newNetwork();
+			network = Network.newNetwork(_numAgents, _numTasks,
+					_numResourceTypes, _maxEachTypePerAgent,
+					_maxEachTypePerTask);
 			network.initializeNetwork(_numAgents, _numTasks, _numResourceTypes,
 					_maxEachTypePerAgent, _maxEachTypePerTask);
-			mapping(network);
+			// mapping(network);
 		}
 			break;
 		case "p":
@@ -87,16 +89,18 @@ public class Interface {
 		case "l": {
 			System.out.println("Put in the file directory:");
 			String file = keyboard.nextLine();
-			if (Network.loadNetwork(file) != null) {
-				System.out.println("Loaded successfully...");
-				mapping(network);
-			} else {
-				System.out
-						.println("Not loaded, using default values for a new network...");
-				network = Network.getInstance();
-				network.initializeNetwork(100, 50, 20, 10, 5);
-				mapping(network);
-			}
+			// if (
+			Network.loadNetwork(file); // != null) {
+			network = Network.getInstance();
+			System.out.println("Loaded successfully...");
+			// mapping(network);
+			// } else {
+			// System.out
+			// .println("Not loaded, using default values for a new network...");
+			// network = Network.getInstance();
+			// // network.initializeNetwork(100, 50, 20, 10, 5);
+			// mapping(network);
+			// }
 		}
 			break;
 
@@ -108,7 +112,7 @@ public class Interface {
 	}
 
 	public static void solveInterface(Network network) {
-
+		mapping(network);
 		Scanner keyboard = new Scanner(System.in);
 		System.out
 				.println("\"B\" to solve using barter mechanism, \"V\" to solve using VCG mechanism:");
@@ -134,11 +138,17 @@ public class Interface {
 	}
 
 	public static void mapping(Network network) {
-		for (Resource r : network.ResourceSet)
+		for (Resource r : network.ResourceSet) {
 			ColumnGenBarter.all_resources.put(r.getID(), r);
-		for (Task t : network.TaskSet)
+			ColumnGenVCG.all_resources.put(r.getID(), r);
+		}
+		for (Task t : network.TaskSet) {
 			ColumnGenBarter.all_tasks.put(t.getID(), t);
-		for (Agent a : network.AgentSet)
+			ColumnGenVCG.all_tasks.put(t.getID(), t);
+		}
+		for (Agent a : network.AgentSet) {
 			ColumnGenBarter.all_agents.put(a.getID(), a);
+			ColumnGenVCG.all_agents.put(a.getID(), a);
+		}
 	}
 }
