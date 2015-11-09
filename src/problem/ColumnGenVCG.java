@@ -369,9 +369,8 @@ public class ColumnGenVCG {
 	}
 
 	public class SubProblem {
+		Resource resourceType;
 		public IloCplex cplex;
-		private IloIntVar[][] x;
-		private IloNumVar[] s;
 		private IloObjective reduced_cost;
 		private IloLinearNumExpr num_expr;
 		private List<IloConstraint> constraints;
@@ -414,7 +413,7 @@ public class ColumnGenVCG {
 		public SubProblem() {
 			this.constraints = new ArrayList<IloConstraint>();
 			createModel();
-			setPriority();
+			// setPriority();
 			Parameters.configureCplex(this);
 			this.mip_call_back = new MyMipCallBack();
 			try {
@@ -424,94 +423,66 @@ public class ColumnGenVCG {
 			}
 		}
 
-		public void setPriority() {
+		// public void setPriority() {
+		// try {
+		// for (int j : all_agents.keySet())
+		// cplex.setPriority(/**/, 1);
+		// } catch (IloException e) {
+		// System.err.println("Concert exception caught: " + e);
+		// }
+		// }
+
+		public void createModel() {
 			try {
-				for (int j : all_agents.keySet())
-					cplex.setPriority(/**/, 1);
+				// define model
+				cplex = new IloCplex();
+				// define variables
+				IloNumVar varphiAgent[][] = new IloNumVar[all_agents.size()][all_tasks
+						.size()];
+				IloIntVar varphi[] = new IloIntVar[all_tasks.size()];
+				for (Task t : all_tasks.values()) {
+					varphi[t.getID()] = cplex.intVar(0, 1);
+
+					for (Agent a : all_agents.values())
+						varphiAgent[a.getID()][t.getID()] = cplex.numVar(0,
+								Double.MAX_VALUE);
+
+				}
+				// define parameters
+
+				// set objective
+				reduced_cost = cplex.addMaximize();
+
+				// set constraint :
+				for (Agent a : all_agents.values()) {
+					num_expr = cplex.linearNumExpr();
+					for (Task t : all_tasks.values()) {
+						if (a.isNeighbor(t.getLocation())
+								|| t.getLocation() == a) {
+							num_expr.add((IloLinearNumExpr) varphiAgent[a
+									.getID()][t.getID()]);
+						}
+					}
+					constraints.add(cplex.addLe(num_expr,
+							a.getResourceSetAgent(resourceType.getID())));
+				}
+				// // set constraint :
+				for (Task t : all_tasks.values()) {
+					num_expr = cplex.linearNumExpr();
+					for (Agent a : all_agents.values()) {
+						if (t.getLocation() == a
+								|| a.isNeighbor(t.getLocation())) {
+							num_expr.add((IloLinearNumExpr) varphiAgent[a
+									.getID()][t.getID()]);
+						}
+					}
+					constraints.add(cplex.addEq(num_expr, cplex.prod(
+							varphi[t.getID()],
+							t.getRequiredResources(resourceType.getID()))));
+				}
 			} catch (IloException e) {
 				System.err.println("Concert exception caught: " + e);
 			}
-		}
-
-		public void createModel() {
-			// try {
-			// // define model
-			// cplex = new IloCplex();
-			// // define variables
-			// x = new IloIntVar[all_nodes.size()][];
-			// for (int i : all_nodes.keySet()) {
-			// x[i] = cplex.boolVarArray(all_nodes.size());
-			// for (int j : all_nodes.keySet()) {
-			// x[i][j].setName("x."+i+"."+j);
-			// }
-			// }
-			// s = cplex.numVarArray(all_nodes.size(), 0, Double.MAX_VALUE);
-			// // define parameters
-			// double M = 0;
-			// for (int i=0; i<all_customers.size(); i++)
-			// for (int j=0; j<all_customers.size(); j++) {
-			// double val = all_customers.get(i).b()
-			// + all_customers.get(i).time_to_node(all_customers.get(j))
-			// + all_customers.get(i).time_at_node()
-			// - all_customers.get(j).a();
-			// if (M<val) M=val;
-			// }
-			// double q = Parameters.capacity;
-			// // set objective
-			// reduced_cost = cplex.addMinimize();
-			// // set constraint : capacity
-			// num_expr = cplex.linearNumExpr();
-			// for (int i : all_customers.keySet())
-			// for (int j : all_nodes.keySet())
-			// num_expr.addTerm( all_customers.get(i).d(), x[i][j]);
-			// constraints.add(cplex.addLe(num_expr, q, "c1"));
-			// // set constraint : start from depot
-			// num_expr = cplex.linearNumExpr();
-			// for (int j : all_nodes.keySet())
-			// num_expr.addTerm(1.0, x[depot_start.id][j]);
-			// constraints.add(cplex.addEq(num_expr, 1, "c2"));
-			// // set constraint : flow conservation
-			// for (int h : all_customers.keySet()) {
-			// num_expr = cplex.linearNumExpr();
-			// for (int i : all_nodes.keySet())
-			// num_expr.addTerm(1.0, x[i][h]);
-			// for (int j : all_nodes.keySet())
-			// num_expr.addTerm(-1.0, x[h][j]);
-			// constraints.add(cplex.addEq(num_expr, 0, "c3"));
-			// }
-			// // set constraint : end at depot
-			// num_expr = cplex.linearNumExpr();
-			// for (int i : all_nodes.keySet())
-			// num_expr.addTerm(1.0, x[i][depot_end.id]);
-			// constraints.add(cplex.addEq(num_expr, 1, "c4"));
-			// // set constraint : sub tour elimination
-			// for (int i : all_nodes.keySet())
-			// for (int j : all_nodes.keySet()) {
-			// double t_ij =
-			// all_nodes.get(i).time_at_node()+all_nodes.get(i).time_to_node(all_nodes.get(j));
-			// num_expr = cplex.linearNumExpr();
-			// num_expr.addTerm( 1.0, s[i]);
-			// num_expr.addTerm(-1.0, s[j]);
-			// num_expr.addTerm( M , x[i][j]);
-			// constraints.add(cplex.addLe(num_expr, M-t_ij, "c5"));
-			// }
-			// // set constraint : time windows
-			// for (int i : all_customers.keySet()) {
-			// constraints.add(cplex.addGe(s[i], all_customers.get(i).a(),
-			// "c6"));
-			// constraints.add(cplex.addLe(s[i], all_customers.get(i).b(),
-			// "c6"));
-			// }
-			// //prohibited moves
-			// num_expr = cplex.linearNumExpr();
-			// for (int i : all_nodes.keySet()) {
-			// num_expr.addTerm(1.0, x[depot_end.id][i]);
-			// num_expr.addTerm(1.0, x[i][depot_start.id]);
-			// num_expr.addTerm(1.0, x[i][i]);
-			// }
-			// constraints.add(cplex.addEq(num_expr, 0, "c7"));
-			// } catch (IloException e) {
-			// System.err.println("Concert exception caught: " + e);
 		}
 
 		public void updateReducedCost() {
