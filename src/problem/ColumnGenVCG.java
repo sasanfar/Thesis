@@ -24,7 +24,7 @@ public class ColumnGenVCG {
 		public int[] allocation = new int[all_agents.size()];
 		public double welfare;
 		public IloNumVar z;
-		public IloIntVar[][] varphiAgent = new IloIntVar[all_agents.size()][all_tasks
+		public IloNumVar[][] varphiAgent = new IloIntVar[all_agents.size()][all_tasks
 				.size()];
 
 		public IloIntVar[] varphi = new IloIntVar[all_tasks.size()];
@@ -146,7 +146,7 @@ public class ColumnGenVCG {
 					for (Configuration c : configList) {
 						c.varphi[t.getID()] = cplex.intVar(0, 1);
 						for (Agent a : all_agents.values()) {
-							c.varphiAgent[a.getID()][t.getID()] = cplex.intVar(
+							c.varphiAgent[a.getID()][t.getID()] = cplex.numVar(
 									0, Integer.MAX_VALUE);
 						}
 					}
@@ -377,16 +377,20 @@ public class ColumnGenVCG {
 		public MyMipCallBack mip_call_back;
 		public double lastObjValue;
 		public double lastObjValueRelaxed;
+		// define variables
+		public IloNumVar varphiAgent[][] = new IloNumVar[all_agents.size()][all_tasks
+				.size()];
+		public IloIntVar varphi[] = new IloIntVar[all_tasks.size()];
 
 		private class MyMipCallBack extends IloCplex.MIPInfoCallback {
 			private boolean aborted;
 			private double time_start;
 			private double time_limit;
 
-			public void setResourceType(Resource r){
-				resourceType=r;
+			public void setResourceType(Resource r) {
+				resourceType = r;
 			}
-			
+
 			public void main() {
 				try {
 					if (!aborted && hasIncumbent()) {
@@ -417,7 +421,7 @@ public class ColumnGenVCG {
 		public SubProblem() {
 			this.constraints = new ArrayList<IloConstraint>();
 			createModel();
-			// setPriority();
+			setPriority();
 			Parameters.configureCplex(this);
 			this.mip_call_back = new MyMipCallBack();
 			try {
@@ -427,23 +431,20 @@ public class ColumnGenVCG {
 			}
 		}
 
-		// public void setPriority() {
-		// try {
-		// for (int j : all_agents.keySet())
-		// cplex.setPriority(/**/, 1);
-		// } catch (IloException e) {
-		// System.err.println("Concert exception caught: " + e);
-		// }
-		// }
+		public void setPriority() {
+			//try {
+				for (int j : all_agents.keySet()) {
+					// cplex.setPriority(/**/, 1);
+				}
+			/*} catch (IloException e) {
+				System.err.println("Concert exception caught: " + e);
+			}*/
+		}
 
 		public void createModel() {
 			try {
 				// define model
 				cplex = new IloCplex();
-				// define variables
-				IloNumVar varphiAgent[][] = new IloNumVar[all_agents.size()][all_tasks
-						.size()];
-				IloIntVar varphi[] = new IloIntVar[all_tasks.size()];
 				for (Task t : all_tasks.values()) {
 					varphi[t.getID()] = cplex.intVar(0, 1);
 
@@ -490,7 +491,6 @@ public class ColumnGenVCG {
 		}
 
 		public void updateReducedCost() {
-			
 
 		}
 
@@ -513,8 +513,15 @@ public class ColumnGenVCG {
 	}
 
 	private void addConfiguration(SubProblem subproblem) {
-	//	Configuration c = new Configuration(r);
-		
+		Configuration c = new Configuration(subproblem.resourceType);
+
+		for (int i = 0; i < subproblem.varphiAgent.length; i++)
+			c.varphi[i] = subproblem.varphi[i];
+		for (int i = 0; i < subproblem.varphiAgent.length; i++)
+			for (int j = 0; j < subproblem.varphiAgent[i].length; j++)
+				c.varphiAgent[i][j] = subproblem.varphiAgent[i][j];
+
+		configList.add(c);
 	}
 
 	private void displayIteration(int iter) {

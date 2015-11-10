@@ -16,8 +16,9 @@ public class Interface {
 			UnsupportedEncodingException {
 		Scanner keyboard = new Scanner(System.in);
 		boolean execute = true;
-		while (!network.initializeNetwork(80, 50, 20, 10, 5));
-			//network.initializeNetwork(80, 50, 20, 10, 5);
+		while (!network.initializeNetwork(80, 50, 20, 10, 5))
+			;
+		// network.initializeNetwork(80, 50, 20, 10, 5);
 		// mapping(network);
 		String command;
 		while (execute) {
@@ -67,7 +68,7 @@ public class Interface {
 			network = Network.newNetwork(_numAgents, _numTasks,
 					_numResourceTypes, _maxEachTypePerAgent,
 					_maxEachTypePerTask);
-			
+
 			// mapping(network);
 		}
 			break;
@@ -88,18 +89,17 @@ public class Interface {
 		case "l": {
 			System.out.println("Put in the file directory:");
 			String file = keyboard.nextLine();
-			// if (
-			Network.loadNetwork(file); // != null) {
-			network = Network.getInstance();
-			System.out.println("Loaded successfully...");
+			if (Network.loadNetwork(file) != null) {
+				network = Network.getInstance();
+				System.out.println("Loaded successfully...");
 			// mapping(network);
-			// } else {
-			// System.out
-			// .println("Not loaded, using default values for a new network...");
-			// network = Network.getInstance();
-			// // network.initializeNetwork(100, 50, 20, 10, 5);
+			} else {
+				System.out
+						.println("Not loaded, using default values for a new network...");
+				network = Network.getInstance();
+				// network.initializeNetwork(100, 50, 20, 10, 5);
 			// mapping(network);
-			// }
+			 }
 		}
 			break;
 

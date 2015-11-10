@@ -6,10 +6,10 @@ import java.io.*;
 
 public class Network implements java.io.Serializable {
 
-	public static List<Task> TaskSet = new ArrayList<Task>();
-	public static List<Resource> ResourceSet = new ArrayList<Resource>();
-	public static List<Agent> AgentSet = new ArrayList<Agent>();
-	public static List<Link> LinkSet = new ArrayList<Link>();
+	public List<Task> TaskSet = new ArrayList<Task>();
+	public List<Resource> ResourceSet = new ArrayList<Resource>();
+	public List<Agent> AgentSet = new ArrayList<Agent>();
+	public List<Link> LinkSet = new ArrayList<Link>();
 
 	private static Network instance = new Network();
 
@@ -25,7 +25,7 @@ public class Network implements java.io.Serializable {
 	public static Network newNetwork(int numAgents, int numTasks,
 			int numResourceTypes, int maxEachTypePerAgent,
 			int maxEachTypePerTask) {
-		instance = new Network();
+		//instance = new Network();
 		instance.initializeNetwork(numAgents, numTasks, numResourceTypes,
 				maxEachTypePerAgent, maxEachTypePerTask);
 		return instance;
@@ -281,7 +281,7 @@ public class Network implements java.io.Serializable {
 			out.writeObject(instance);
 			out.close();
 			fileOut.close();
-			System.out.printf("Serialized data is saved in:" + file);
+			System.out.printf("Serialized data is saved in:" + file + "\n");
 			return true;
 		} catch (IOException i) {
 			i.printStackTrace();
@@ -289,27 +289,32 @@ public class Network implements java.io.Serializable {
 		}
 	}
 
-	public static void loadNetwork(String fileLocation) {
+	public static Network loadNetwork(String fileLocation) {
 		Network loaded = null;
 		try {
-			FileInputStream fileIn = new FileInputStream("/tmp/employee.ser");
+			FileInputStream fileIn = new FileInputStream(fileLocation);
 			ObjectInputStream in = new ObjectInputStream(fileIn);
 			loaded = (Network) in.readObject();
 			in.close();
 			fileIn.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
 
-		} catch (IOException i) {
-			i.printStackTrace();
-			return;
-		} catch (ClassNotFoundException c) {
-			System.out.println("Employee class not found");
-			c.printStackTrace();
-			return;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		} catch (ClassNotFoundException e) {
+			System.out.println("Network class not found");
+			e.printStackTrace();
+			return null;
 		}
 		if (loaded != null) {
 			loaded.print();
 			instance = loaded;
-		}
+			return instance;
+		} else
+			return null;
 	}
 
 }
