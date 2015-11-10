@@ -67,8 +67,7 @@ public class Interface {
 			network = Network.newNetwork(_numAgents, _numTasks,
 					_numResourceTypes, _maxEachTypePerAgent,
 					_maxEachTypePerTask);
-			network.initializeNetwork(_numAgents, _numTasks, _numResourceTypes,
-					_maxEachTypePerAgent, _maxEachTypePerTask);
+			
 			// mapping(network);
 		}
 			break;
