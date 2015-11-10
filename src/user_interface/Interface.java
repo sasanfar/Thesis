@@ -16,8 +16,8 @@ public class Interface {
 			UnsupportedEncodingException {
 		Scanner keyboard = new Scanner(System.in);
 		boolean execute = true;
-		while (!network.initializeNetwork(80, 50, 20, 10, 5))
-			network.initializeNetwork(80, 50, 20, 10, 5);
+		while (!network.initializeNetwork(80, 50, 20, 10, 5));
+			//network.initializeNetwork(80, 50, 20, 10, 5);
 		// mapping(network);
 		String command;
 		while (execute) {

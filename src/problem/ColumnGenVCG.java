@@ -506,9 +506,15 @@ public class ColumnGenVCG {
 			masterproblem.solveRelaxation();
 			subproblem.updateReducedCost();
 			subproblem.solve();
+			addConfiguration(subproblem);
 			displayIteration(iteration_counter);
 		} while (subproblem.lastObjValue < Parameters.ColGen.zero_reduced_cost_AbortColGen);
 		masterproblem.solveMIP();
+	}
+
+	private void addConfiguration(SubProblem subproblem) {
+	//	Configuration c = new Configuration(r);
+		
 	}
 
 	private void displayIteration(int iter) {

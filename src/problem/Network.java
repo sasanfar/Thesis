@@ -6,10 +6,10 @@ import java.io.*;
 
 public class Network implements java.io.Serializable {
 
-	public List<Task> TaskSet = new ArrayList<Task>();
-	public List<Resource> ResourceSet = new ArrayList<Resource>();
-	public List<Agent> AgentSet = new ArrayList<Agent>();
-	public List<Link> LinkSet = new ArrayList<Link>();
+	public static List<Task> TaskSet = new ArrayList<Task>();
+	public static List<Resource> ResourceSet = new ArrayList<Resource>();
+	public static List<Agent> AgentSet = new ArrayList<Agent>();
+	public static List<Link> LinkSet = new ArrayList<Link>();
 
 	private static Network instance = new Network();
 
@@ -26,15 +26,19 @@ public class Network implements java.io.Serializable {
 			int numResourceTypes, int maxEachTypePerAgent,
 			int maxEachTypePerTask) {
 		instance = new Network();
-		instance.initializeNetwork( numAgents,  numTasks,
-				 numResourceTypes,  maxEachTypePerAgent,
-				 maxEachTypePerTask);
+		instance.initializeNetwork(numAgents, numTasks, numResourceTypes,
+				maxEachTypePerAgent, maxEachTypePerTask);
 		return instance;
 	}
 
 	public boolean initializeNetwork(int numAgents, int numTasks,
 			int numResourceTypes, int maxEachTypePerAgent,
 			int maxEachTypePerTask) {
+
+		TaskSet = new ArrayList<Task>();
+		ResourceSet = new ArrayList<Resource>();
+		AgentSet = new ArrayList<Agent>();
+		LinkSet = new ArrayList<Link>();
 
 		if (numAgents <= 0 || numResourceTypes <= 0 || numTasks <= 0) {
 			System.out.println("Error in inputs!");
