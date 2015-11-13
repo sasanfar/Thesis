@@ -1,5 +1,7 @@
 package problem;
 
+import Parameters;
+
 import java.util.*;
 
 import elements.*;
@@ -432,13 +434,14 @@ public class ColumnGenVCG {
 		}
 
 		public void setPriority() {
-			//try {
-				for (int j : all_agents.keySet()) {
-					// cplex.setPriority(/**/, 1);
-				}
-			/*} catch (IloException e) {
-				System.err.println("Concert exception caught: " + e);
-			}*/
+			// try {
+			for (int j : all_agents.keySet()) {
+				// cplex.setPriority(/**/, 1);
+			}
+			/*
+			 * } catch (IloException e) {
+			 * System.err.println("Concert exception caught: " + e); }
+			 */
 		}
 
 		public void createModel() {
@@ -495,7 +498,33 @@ public class ColumnGenVCG {
 		}
 
 		public void solve() {
+			try {
+				mip_call_back.reset();
+				if (cplex.solve()) {
+					this.lastObjValue = cplex.getObjValue();
+					this.lastObjValueRelaxed = cplex.getBestObjValue();
+					int nPool = cplex.getSolnPoolNsolns();
+					for (int i = 0; i < nPool; i++) {
+						if (cplex.getObjValue(i) < Parameters.ColGen.zero_reduced_cost) {
+							addConfiguration(i);
+						}
+					}
+				}
+			} catch (IloException e) {
+				System.err.println("Concert exception caught: " + e);
+			}
+		}
 
+		private void addConfiguration(int nSol) {
+			Configuration c = new Configuration(subproblem.resourceType);
+
+			for (int i = 0; i < subproblem.varphiAgent.length; i++)
+				c.varphi[i] = subproblem.varphi[i];
+			for (int i = 0; i < subproblem.varphiAgent.length; i++)
+				for (int j = 0; j < subproblem.varphiAgent[i].length; j++)
+					c.varphiAgent[i][j] = subproblem.varphiAgent[i][j];
+
+			configList.add(c);
 		}
 	}
 
@@ -506,22 +535,9 @@ public class ColumnGenVCG {
 			masterproblem.solveRelaxation();
 			subproblem.updateReducedCost();
 			subproblem.solve();
-			addConfiguration(subproblem);
 			displayIteration(iteration_counter);
 		} while (subproblem.lastObjValue < Parameters.ColGen.zero_reduced_cost_AbortColGen);
 		masterproblem.solveMIP();
-	}
-
-	private void addConfiguration(SubProblem subproblem) {
-		Configuration c = new Configuration(subproblem.resourceType);
-
-		for (int i = 0; i < subproblem.varphiAgent.length; i++)
-			c.varphi[i] = subproblem.varphi[i];
-		for (int i = 0; i < subproblem.varphiAgent.length; i++)
-			for (int j = 0; j < subproblem.varphiAgent[i].length; j++)
-				c.varphiAgent[i][j] = subproblem.varphiAgent[i][j];
-
-		configList.add(c);
 	}
 
 	private void displayIteration(int iter) {
