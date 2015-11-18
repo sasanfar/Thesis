@@ -3,14 +3,18 @@ package problem;
 import elements.*;
 
 import java.util.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.io.*;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import user_interface.Interface;
 
-public class Network  implements java.io.Serializable {
+public class Network implements java.io.Serializable {
 
 	public List<Task> TaskSet = new ArrayList<Task>();
 	public List<Resource> ResourceSet = new ArrayList<Resource>();
@@ -86,14 +90,16 @@ public class Network  implements java.io.Serializable {
 		 */
 		int linkID = 0;
 		for (Agent a1 : AgentSet) {
-			for (Agent a2 : AgentSet) {
-				if (a2 != a1 && !a1.isNeighbor(a2) && Math.random() >= 0.5) {
-					Link l = new Link(linkID, a1, a2);
-					linkID++;
-					a1.setNeighbor(a2);
-					LinkSet.add(l);
+			int startinLinkForAgent = linkID;
+			if (linkID - startinLinkForAgent < numAgents / 2)
+				for (Agent a2 : AgentSet) {
+					if (a2 != a1 && !a1.isNeighbor(a2) && Math.random() >= 0.5) {
+						Link l = new Link(linkID, a1, a2);
+						linkID++;
+						a1.setNeighbor(a2);
+						LinkSet.add(l);
+					}
 				}
-			}
 		}
 		if (LinkSet.size() < numAgents - 1)
 			return false; // return "FALSE" if SMALLER than a TREE
@@ -331,20 +337,28 @@ public class Network  implements java.io.Serializable {
 			return null;
 	}
 
-
 	public void draw() {
-		 SwingUtilities.invokeLater(new Runnable() {
-	            @Override
-	            public void run() {
-	                JFrame frame = new JFrame("Door");
-	                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-	                Graph panel = new Graph();
-	                frame.add(panel);
-	                frame.pack();
-	                frame.setVisible(true);
-	            }
-	        });
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				JFrame frame = new JFrame("Generated Network");
+				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				Graph panel = new Graph();
+				frame.add(panel, BorderLayout.WEST);
+//				final JPanel p = new JPanel() {
+//					@Override
+//					protected void paintComponent(Graphics g) {
+//						super.paintComponent(g);
+//						g.drawString("Tasks", 0, 0);
+//												
+//					}
+//				};
+//				p.setPreferredSize(new Dimension(50,800));
+//				frame.add(p, BorderLayout.EAST);
+				frame.pack();
+				frame.setVisible(true);
+			}
+		});
 	}
 
 }

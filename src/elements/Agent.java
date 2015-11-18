@@ -3,6 +3,8 @@ package elements;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.util.*;
 
 import problem.Network;
@@ -88,15 +90,36 @@ public class Agent {
 	}
 
 	public void draw(Graphics g) {
+
 		g.setColor(Color.red);
 		Font f = new Font("Times New Roman (Headings CS)", Font.BOLD, 16);
+
 		g.setFont(f);
 		g.drawString("A" + ID, (int) x * 10 + 10, (int) y * 10 + 10);
 
-		
-		g.setColor(Color.green);
-		for (int i=0; i<TaskSetAgent.size(); i++)
-			g.drawString("T" + TaskSetAgent.get(i).getID(), (int) x * 10 + 10 + i+10,
-					(int) (y * 10 + 10) );
+		// tasks
+		f = new Font("Calibri", Font.BOLD, 14);
+		g.setFont(f);
+		String taskString = " ";
+		for (int i = 0; i < TaskSetAgent.size(); i++) {
+			String tmp = "T" + TaskSetAgent.get(i).getID() + " ";
+			taskString = taskString + tmp;
+		}
+
+		g.drawString(taskString, (int) (x * 10 + 20) , (int) (y * 10 + 17));
+
+		// resources
+		g.setColor(Color.blue);
+		f = new Font("Calibri", Font.BOLD, 14);
+		g.setFont(f);
+		String resourceString = "";
+		for (int i = 0; i < ResourceSetAgent.length; i++)
+			if (ResourceSetAgent[i] > 0) {
+				String tmp = ResourceSetAgent[i] + "*R" + i + " ";
+				resourceString = resourceString + tmp;
+			}
+
+		g.drawString(resourceString, (int) (x * 10 + 10) + 10,
+				(int) (y * 10 + 27) );
 	}
 }

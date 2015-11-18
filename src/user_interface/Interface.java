@@ -55,7 +55,7 @@ public class Interface extends JApplet {
 		Scanner keyboard = new Scanner(System.in);
 		String command;
 		System.out
-				.println("\"N\" for new network, \"P\" to print the network, \"D\" to draw the network, \"S\" to save current network, \"L\" for loading a network:");
+				.println("\"N\" for new network, \"D\" to draw the network, \"P\" to print the network, \"S\" to save current network, \"L\" for loading a network:");
 		command = keyboard.nextLine();
 		command = command.toLowerCase();
 		switch (command) {
