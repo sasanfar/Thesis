@@ -1,7 +1,5 @@
 package problem;
 
-import Parameters;
-
 import java.util.*;
 
 import elements.*;
@@ -14,8 +12,8 @@ public class ColumnGenVCG {
 	public static Map<Integer, Resource> all_resources = new HashMap<Integer, Resource>();
 	public static Map<Integer, Task> all_tasks = new HashMap<Integer, Task>();
 
-	public MasterProblem masterproblem;
-	public SubProblem subproblem;
+	public MasterProblem masterproblem = new MasterProblem();
+	public SubProblem subproblem = new SubProblem();
 	public Logger logger = new Logger();
 
 	public List<Configuration> configList = new ArrayList<ColumnGenVCG.Configuration>();
@@ -86,17 +84,18 @@ public class ColumnGenVCG {
 		private IloNumVar[] u = new IloNumVar[all_tasks.size()];
 		private IloNumVar[][] E_N = new IloNumVar[all_agents.size()][all_resources
 				.size()];
-
+		List<IloRange> constraints = new ArrayList<IloRange>();
 		public Logger logger = new Logger();
 
 		public MasterProblem() {
-			createModel();
 			creatDefaultConfigurations();
+			createModel();
 			Parameters.configureCplex(this);
 
 		}
 
 		public void creatDefaultConfigurations() {
+			configList=new ArrayList<Configuration>();
 			for (Resource r : all_resources.values()) {
 				Configuration c = new Configuration(r);
 				configList.add(c);
@@ -105,38 +104,35 @@ public class ColumnGenVCG {
 
 		public void createModel() {
 			try {
+				Configuration c = configList.get(configList.size() - 1);
+
 				cplex = new IloCplex();
 
 				// ----------------------------------------------------------------------
 				// Objective
 				// ----------------------------------------------------------------------
 				socialWelfare = cplex.linearNumExpr();
-				IloLinearNumExpr obj_task = cplex.linearNumExpr();
+				
 				for (Resource k : all_resources.values())
-					for (Configuration c : configList) {
-						if (c.getResourceTypeOfConfiguration() == k) {
-							for (Agent a : all_agents.values()) {
-								obj_task.add((IloLinearNumExpr) cplex.prod(-1,
-										E_N[a.getID()][k.getID()]));
-								for (Agent a2 : all_agents.values()) {
-									for (Task t : a2.getTaskSetAgent())
-										if (a2 != a)
-											obj_task.add((IloLinearNumExpr) cplex
-													.prod(u[t.getID()], cplex
-															.prod(c.varphi[t
-																	.getID()],
-																	c.z)));
-								}
+					if (c.getResourceTypeOfConfiguration() == k) {
+						for (Agent a : all_agents.values()) {
+							socialWelfare.addTerm(-1,
+									E_N[a.getID()][k.getID()]);
+							for (Agent a2 : all_agents.values()) {
+								for (Task t : a2.getTaskSetAgent())
+									if (a2 != a)
+										socialWelfare.add(cplex.prod(u[t.getID()], cplex.prod(
+														c.varphi[t.getID()],
+														c.z)));
 
 							}
 						}
 					}
 
 				for (Task t : all_tasks.values())
-					obj_task.add((IloLinearNumExpr) cplex.prod(y[t.getID()],
+					socialWelfare.add((IloLinearNumExpr) cplex.prod(y[t.getID()],
 							u[t.getID()]));
 
-				socialWelfare = obj_task;
 
 				cplex.addMaximize(socialWelfare);
 
@@ -145,12 +141,11 @@ public class ColumnGenVCG {
 				// ----------------------------------------------------------------------
 				for (Task t : all_tasks.values()) {
 					y[t.getID()] = cplex.intVar(0, 1);
-					for (Configuration c : configList) {
-						c.varphi[t.getID()] = cplex.intVar(0, 1);
-						for (Agent a : all_agents.values()) {
-							c.varphiAgent[a.getID()][t.getID()] = cplex.numVar(
-									0, Integer.MAX_VALUE);
-						}
+					c.varphi[t.getID()] = cplex.intVar(0, 1);
+					for (Agent a : all_agents.values()) {
+						c.varphiAgent[a.getID()][t.getID()] = cplex.numVar(0,
+								Integer.MAX_VALUE);
+
 					}
 				}
 				for (Agent a : all_agents.values()) {
@@ -167,7 +162,7 @@ public class ColumnGenVCG {
 				// ----------------------------------------------------------------------
 				// Constraints
 				// ----------------------------------------------------------------------
-				List<IloRange> constraints = new ArrayList<IloRange>();
+
 				// // 24
 				for (Task t : all_tasks.values())
 					for (Resource k : all_resources.values()) {
@@ -175,11 +170,10 @@ public class ColumnGenVCG {
 						for (Agent a : all_agents.values()) {
 							if (t.getLocation() == a
 									|| t.getLocation().isNeighbor(a))
-								for (Configuration c : configList)
-									if (c.getResourceTypeOfConfiguration() == k)
-										num_expr.add((IloLinearNumExpr) cplex.prod(
-												c.varphiAgent[a.getID()][t
-														.getID()], c.z));
+								if (c.getResourceTypeOfConfiguration() == k)
+									num_expr.add((IloLinearNumExpr) cplex.prod(
+											c.varphiAgent[a.getID()][t.getID()],
+											c.z));
 							constraints.add((IloRange) cplex.addGe(
 									num_expr,
 									cplex.prod(y[t.getID()],
@@ -189,13 +183,12 @@ public class ColumnGenVCG {
 								num_expr = cplex.linearNumExpr();
 								if ((t.getLocation() == a2 || t.getLocation()
 										.isNeighbor(a2)) && a != a2)
-									for (Configuration c : configList)
-										if (c.getResourceTypeOfConfiguration() == k) {
-											num_expr.add((IloLinearNumExpr) cplex.prod(
-													c.varphiAgent[a2.getID()][t
-															.getID()], c.z_N[a
-															.getID()]));
-										}
+									if (c.getResourceTypeOfConfiguration() == k) {
+										num_expr.add((IloLinearNumExpr) cplex.prod(
+												c.varphiAgent[a2.getID()][t
+														.getID()], c.z_N[a
+														.getID()]));
+									}
 							}
 							constraints.add((IloRange) cplex.addGe(
 									num_expr,
@@ -208,33 +201,31 @@ public class ColumnGenVCG {
 				for (Resource k : all_resources.values()) {
 					for (Agent a : all_agents.values()) {
 						num_expr = cplex.linearNumExpr();
-						for (Configuration c : configList) {
-							if (c.getResourceTypeOfConfiguration() == k) {
-								for (Task t : all_tasks.values()) {
-									num_expr.add((IloLinearNumExpr) cplex.prod(
-											c.varphiAgent[a.getID()][t.getID()],
-											c.z));
-								}
-								constraints.add(cplex.addLe(num_expr,
-										c.allocation[a.getID()], "C25"));
+						if (c.getResourceTypeOfConfiguration() == k) {
+							for (Task t : all_tasks.values()) {
+								num_expr.add((IloLinearNumExpr) cplex.prod(
+										c.varphiAgent[a.getID()][t.getID()],
+										c.z));
 							}
+							constraints.add(cplex.addLe(num_expr,
+									c.allocation[a.getID()], "C25"));
+
 						}
 
 						// ////27
 						for (Agent a2 : all_agents.values()) {
 							num_expr = cplex.linearNumExpr();
-							for (Configuration c : configList) {
-								if (c.getResourceTypeOfConfiguration() == k
-										&& a2 != a) {
-									for (Task t : all_tasks.values()) {
+							if (c.getResourceTypeOfConfiguration() == k
+									&& a2 != a) {
+								for (Task t : all_tasks.values()) {
 
-										num_expr.add((IloLinearNumExpr) cplex.prod(
-												c.varphiAgent[a2.getID()][t
-														.getID()], c.z));
-									}
-									constraints.add(cplex.addLe(num_expr,
-											c.allocation[a2.getID()], "C27"));
+									num_expr.add((IloLinearNumExpr) cplex.prod(
+											c.varphiAgent[a2.getID()][t.getID()],
+											c.z));
 								}
+								constraints.add(cplex.addLe(num_expr,
+										c.allocation[a2.getID()], "C27"));
+
 							}
 						}
 					}
@@ -243,16 +234,15 @@ public class ColumnGenVCG {
 				for (Resource k : all_resources.values()) {
 					for (Agent a : all_agents.values()) {
 						num_expr = cplex.linearNumExpr();
-						for (Configuration c : configList) {
-							for (Agent a2 : all_agents.values()) {
-								for (Task t : a2.getTaskSetAgent()) {
-									if (c.getResourceTypeOfConfiguration() == k
-											&& a2 != a) {
-										num_expr.add((IloLinearNumExpr) cplex
-												.prod(u[t.getID()], cplex.prod(
-														c.varphi[t.getID()],
-														c.z_N[a.getID()])));
-									}
+						for (Agent a2 : all_agents.values()) {
+							for (Task t : a2.getTaskSetAgent()) {
+								if (c.getResourceTypeOfConfiguration() == k
+										&& a2 != a) {
+									num_expr.add((IloLinearNumExpr) cplex.prod(
+											u[t.getID()], cplex.prod(
+													c.varphi[t.getID()],
+													c.z_N[a.getID()])));
+
 								}
 							}
 
@@ -264,23 +254,21 @@ public class ColumnGenVCG {
 				// ////29
 				for (Resource k : all_resources.values()) {
 					num_expr = cplex.linearNumExpr();
-					for (Configuration c : configList) {
-						if (c.getResourceTypeOfConfiguration() == k)
-							num_expr.add((IloLinearNumExpr) c.z);
-					}
-					constraints.add(cplex.addLe(num_expr, 1, "C29"));
+					if (c.getResourceTypeOfConfiguration() == k)
+						num_expr.add((IloLinearNumExpr) c.z);
 				}
+				constraints.add(cplex.addLe(num_expr, 1, "C29"));
+
 				// ////30
 				for (Resource k : all_resources.values()) {
 					for (Agent a : all_agents.values()) {
 						num_expr = cplex.linearNumExpr();
-						for (Configuration c : configList) {
-							if (c.getResourceTypeOfConfiguration() == k) {
-								num_expr.add((IloLinearNumExpr) c.z_N[a.getID()]);
-							}
+						if (c.getResourceTypeOfConfiguration() == k) {
+							num_expr.add((IloLinearNumExpr) c.z_N[a.getID()]);
 						}
-						constraints.add(cplex.addLe(num_expr, 1, "C30"));
 					}
+					constraints.add(cplex.addLe(num_expr, 1, "C30"));
+
 				}
 				// ////31
 				for (Resource k : all_resources.values()) {
@@ -435,13 +423,13 @@ public class ColumnGenVCG {
 
 		public void setPriority() {
 			// try {
-			for (int j : all_agents.keySet()) {
-				// cplex.setPriority(/**/, 1);
-			}
-			/*
-			 * } catch (IloException e) {
-			 * System.err.println("Concert exception caught: " + e); }
-			 */
+			// // for (int j : all_agents.keySet()) {
+			// // // cplex.setPriority(/**/, 1);
+			// // }
+			// } catch (IloException e) {
+			// System.err.println("Concert exception caught: " + e);
+			// }
+
 		}
 
 		public void createModel() {
@@ -456,7 +444,6 @@ public class ColumnGenVCG {
 								Double.MAX_VALUE);
 
 				}
-				// define parameters
 
 				// set objective
 				reduced_cost = cplex.addMaximize();
@@ -494,7 +481,28 @@ public class ColumnGenVCG {
 		}
 
 		public void updateReducedCost() {
+			try {
+				IloLinearNumExpr num_expr = cplex.linearNumExpr();
 
+				for (IloRange r : ColumnGenVCG.this.masterproblem.constraints)
+					if (r.getName().equals("C24")) {
+						// num_expr.add(arg0);
+					} else if (r.getName().equals("C25")) {
+						// num_expr.add(arg0);
+					} else if (r.getName().equals("C26")) {
+						// num_expr.add(arg0);
+					} else if (r.getName().equals("C27")) {
+						// num_expr.add(arg0);
+						/*
+						 * } else if (r.getName().equals("C28")) { //
+						 * num_expr.add(arg0); } ...
+						 */
+					}
+				reduced_cost.clearExpr();
+				reduced_cost.setExpr(num_expr);
+			} catch (IloException e) {
+
+			}
 		}
 
 		public void solve() {

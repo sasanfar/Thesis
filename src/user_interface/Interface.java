@@ -1,22 +1,25 @@
 package user_interface;
 
+import java.awt.Graphics;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+
+import javax.swing.JApplet;
 
 import elements.Agent;
 import elements.Resource;
 import elements.Task;
 import problem.*;
 
-public class Interface {
+public class Interface extends JApplet {
 	public static Network network = Network.getInstance();
 
 	public static void main(String[] args) throws FileNotFoundException,
 			UnsupportedEncodingException {
 		Scanner keyboard = new Scanner(System.in);
 		boolean execute = true;
-		while (!network.initializeNetwork(80, 50, 20, 10, 5))
+		while (!network.initializeNetwork(20, 15, 10, 5, 5))
 			;
 		// network.initializeNetwork(80, 50, 20, 10, 5);
 		// mapping(network);
@@ -52,7 +55,7 @@ public class Interface {
 		Scanner keyboard = new Scanner(System.in);
 		String command;
 		System.out
-				.println("\"N\" for new network, \"P\" to print the network, \"S\" to save current network, \"L\" for loading a network:");
+				.println("\"N\" for new network, \"P\" to print the network, \"D\" to draw the network, \"S\" to save current network, \"L\" for loading a network:");
 		command = keyboard.nextLine();
 		command = command.toLowerCase();
 		switch (command) {
@@ -76,6 +79,10 @@ public class Interface {
 			network.print();
 			break;
 
+		case "d":
+			network.draw();
+			break;
+			
 		case "s": {
 			System.out.println("Put in the file directory:");
 			String file = keyboard.nextLine();

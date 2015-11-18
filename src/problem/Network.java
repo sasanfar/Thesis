@@ -1,10 +1,16 @@
 package problem;
 
 import elements.*;
+
 import java.util.*;
 import java.io.*;
 
-public class Network implements java.io.Serializable {
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
+
+public class Network  implements java.io.Serializable {
 
 	public List<Task> TaskSet = new ArrayList<Task>();
 	public List<Resource> ResourceSet = new ArrayList<Resource>();
@@ -25,7 +31,7 @@ public class Network implements java.io.Serializable {
 	public static Network newNetwork(int numAgents, int numTasks,
 			int numResourceTypes, int maxEachTypePerAgent,
 			int maxEachTypePerTask) {
-		//instance = new Network();
+		// instance = new Network();
 		instance.initializeNetwork(numAgents, numTasks, numResourceTypes,
 				maxEachTypePerAgent, maxEachTypePerTask);
 		return instance;
@@ -118,7 +124,7 @@ public class Network implements java.io.Serializable {
 
 	public void print() {
 		// PRINTING ADJACENCY MATRIX
-		System.out.println("ADJACENCY MATRIX:");
+		System.out.println("\n\nADJACENCY MATRIX:");
 		System.out.println("=================");
 		System.out.print("    ");
 		for (Agent agent : AgentSet)
@@ -134,6 +140,14 @@ public class Network implements java.io.Serializable {
 					System.out.printf("%-5d", 0);
 			}
 			System.out.println();
+		}
+
+		// PRINTING AGENTS' LOCATIONS
+		System.out.println("\nAGENTS' LOCATIONS:");
+		System.out.println("==================");
+		for (Agent agent : AgentSet) {
+			System.out.printf("A%-2d:(%.2f,%.2f)\n", agent.getID(),
+					agent.getX(), agent.getY());
 		}
 
 		// PRINTING RESOURCE ALLOCATION
@@ -315,6 +329,22 @@ public class Network implements java.io.Serializable {
 			return instance;
 		} else
 			return null;
+	}
+
+
+	public void draw() {
+		 SwingUtilities.invokeLater(new Runnable() {
+	            @Override
+	            public void run() {
+	                JFrame frame = new JFrame("Door");
+	                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+	                Graph panel = new Graph();
+	                frame.add(panel);
+	                frame.pack();
+	                frame.setVisible(true);
+	            }
+	        });
 	}
 
 }

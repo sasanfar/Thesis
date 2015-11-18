@@ -1,5 +1,8 @@
 package elements;
 
+import java.awt.Color;
+import java.awt.Graphics;
+
 public class Task {
 
 	int ID;
@@ -43,4 +46,5 @@ public class Task {
 	public void setLocation(Agent location) {
 		this.location = location;
 	}
+
 }
