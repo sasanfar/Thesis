@@ -1,18 +1,13 @@
 package user_interface;
 
-import java.awt.Graphics;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
-
-import javax.swing.JApplet;
-
-import elements.Agent;
-import elements.Resource;
-import elements.Task;
+import Barter.ColumnGenBarter;
+import VCG.ColumnGenVCG;
 import problem.*;
 
-public class Interface extends JApplet {
+public class Interface {
 	public static Network network = Network.getInstance();
 
 	public static void main(String[] args) throws FileNotFoundException,
@@ -21,8 +16,6 @@ public class Interface extends JApplet {
 		boolean execute = true;
 		while (!network.initializeNetwork(20, 15, 10, 5, 5))
 			;
-		// network.initializeNetwork(80, 50, 20, 10, 5);
-		// mapping(network);
 		String command;
 		while (execute) {
 			System.out
@@ -72,7 +65,6 @@ public class Interface extends JApplet {
 					_numResourceTypes, _maxEachTypePerAgent,
 					_maxEachTypePerTask);
 
-			// mapping(network);
 		}
 			break;
 		case "p":
@@ -118,7 +110,6 @@ public class Interface extends JApplet {
 	}
 
 	public static void solveInterface(Network network) {
-		mapping(network);
 		Scanner keyboard = new Scanner(System.in);
 		System.out
 				.println("\"B\" to solve using barter mechanism, \"V\" to solve using VCG mechanism:");
@@ -127,34 +118,19 @@ public class Interface extends JApplet {
 		command = command.toLowerCase();
 		switch (command) {
 		case "b":
-			ColumnGenBarter columnGenBarter = new ColumnGenBarter();
+			ColumnGenBarter columnGenBarter = ColumnGenBarter.getInstance();
 			columnGenBarter.runColumnGeneration();
 			break;
 
 		case "v":
-			ColumnGenVCG columnGenVCG = new ColumnGenVCG();
-			columnGenVCG.runColumnGeneration();
+			ColumnGenVCG columnGenVCG = ColumnGenVCG.getInstance();
+			columnGenVCG.runColumnGenerationVCG();
 			break;
 
 		default:
 			System.out.println("Wrong input!");
 			keyboard.close();
 			break;
-		}
-	}
-
-	public static void mapping(Network network) {
-		for (Resource r : network.ResourceSet) {
-			ColumnGenBarter.all_resources.put(r.getID(), r);
-			ColumnGenVCG.all_resources.put(r.getID(), r);
-		}
-		for (Task t : network.TaskSet) {
-			ColumnGenBarter.all_tasks.put(t.getID(), t);
-			ColumnGenVCG.all_tasks.put(t.getID(), t);
-		}
-		for (Agent a : network.AgentSet) {
-			ColumnGenBarter.all_agents.put(a.getID(), a);
-			ColumnGenVCG.all_agents.put(a.getID(), a);
 		}
 	}
 }

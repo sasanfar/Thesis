@@ -27,6 +27,7 @@ public class Graph extends JPanel {
 				
 			}
 		};
+		
 		drawingPanel.setBackground(Color.white);
 		add(drawingPanel);
 		JPanel holder = new JPanel();

@@ -27,7 +27,7 @@ public class Link {
 	}
 
 	public void draw(Graphics g) {
-		g.setColor(Color.black);
+		g.setColor(Color.green);
 		g.drawLine((int) firstNode.getX() * 10 + 10,
 				(int) firstNode.getY() * 10 + 10,
 				(int) secondNode.getX() * 10 + 10,
