@@ -14,12 +14,6 @@ public class Configuration {
 	int ID;
 	public int[] allocation = new int[Interface.network.AgentSet.size()];
 	public double welfare;
-	public IloNumVar z;
-	public Double[][] varphiAgent = new Double[Interface.network.AgentSet.size()][Interface.network.TaskSet
-			.size()];
-
-	public Double[] varphi = new Double[Interface.network.TaskSet.size()];
-	public IloIntVar[] z_N = new IloIntVar[Interface.network.AgentSet.size()];
 
 	public Configuration(Resource r) {
 		resourceType = r;

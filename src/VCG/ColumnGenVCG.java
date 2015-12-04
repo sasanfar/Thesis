@@ -31,8 +31,8 @@ public class ColumnGenVCG {
 			do {
 				iteration_counter++;
 				instance.masterproblem.solveRelaxation();
-				instance.subproblem.updateReducedCost(r);
-				instance.subproblem.solve(r);
+				instance.subproblem.updateReducedCost(masterproblem.constraints);
+				instance.subproblem.solve();
 				displayIteration(iteration_counter);
 			} while (subproblem.lastObjValue < ParametersVCG.ColGen.zero_reduced_cost_AbortColGen);
 		}

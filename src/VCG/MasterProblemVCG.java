@@ -19,6 +19,17 @@ public class MasterProblemVCG {
 	private Map<Agent, Double> pi = new HashMap<Agent, Double>(); // agents'
 																	// duals
 	private List<IloConversion> mipConversion = new ArrayList<IloConversion>();
+
+	public IloNumVar[] z = new IloNumVar[ColumnGenVCG.getInstance().configList
+			.size()];
+	public Double[][][] varphiAgent = new Double[ColumnGenVCG.getInstance().configList
+			.size()][Interface.network.AgentSet.size()][Interface.network.TaskSet
+			.size()];
+
+	public Double[][] varphi = new Double[ColumnGenVCG.getInstance().configList
+			.size()][Interface.network.TaskSet.size()];
+	public IloNumVar[][] z_N = new IloNumVar[ColumnGenVCG.getInstance().configList
+			.size()][Interface.network.AgentSet.size()];
 	public double lastObjValue;
 
 	IloLinearNumExpr num_expr;
@@ -30,7 +41,7 @@ public class MasterProblemVCG {
 	private IloIntVar[] y = new IloIntVar[Interface.network.TaskSet.size()];
 	private IloNumVar[][] E_N = new IloNumVar[Interface.network.AgentSet.size()][Interface.network.ResourceSet
 			.size()];
-	List<IloConstraint> constraints = new ArrayList<IloConstraint>();
+	List<IloRange> constraints = new ArrayList<IloRange>();
 	public Logger logger = new Logger();
 
 	public MasterProblemVCG() {
@@ -49,29 +60,44 @@ public class MasterProblemVCG {
 
 	public void createModel() {
 		try {
-			Configuration c = ColumnGenVCG.getInstance().configList
-					.get(ColumnGenVCG.getInstance().configList.size() - 1);
 
 			cplex = new IloCplex();
+			// Variables
+			for (int c = 0; c < ColumnGenVCG.getInstance().configList.size(); c++) {
+				Configuration config = ColumnGenVCG.getInstance().configList
+						.get(c);
+				z = cplex.numVarArray(
+						ColumnGenVCG.getInstance().configList.size(), 0, 1);
 
+				for (Task t : Interface.network.TaskSet) {
+					for (Agent a : Interface.network.AgentSet) {
+
+					}
+				}
+
+				// z = master.boolVarArray(configuration.length);
+			}
 			// ----------------------------------------------------------------------
 			// Objective
 			// ----------------------------------------------------------------------
 			socialWelfare = cplex.linearNumExpr();
 
 			for (Resource k : Interface.network.ResourceSet)
-				if (c.getResourceTypeOfConfiguration() == k) {
-					for (Agent a : Interface.network.AgentSet) {
-						socialWelfare.addTerm(-1, E_N[a.getID()][k.getID()]);
-						for (Agent a2 : Interface.network.AgentSet) {
-							for (Task t : a2.getTaskSetAgent())
-								if (a2 != a)
-									socialWelfare.addTerm(t.getUtility()
-											* c.varphi[t.getID()], c.z);
+				for (Configuration c : ColumnGenVCG.getInstance().configList)
+					if (c.getResourceTypeOfConfiguration() == k) {
+						for (Agent a : Interface.network.AgentSet) {
+							socialWelfare
+									.addTerm(-1, E_N[a.getID()][k.getID()]);
+							for (Agent a2 : Interface.network.AgentSet) {
+								for (Task t : a2.getTaskSetAgent())
+									if (a2 != a)
+										socialWelfare.addTerm(t.getUtility()
+												* varphi[c.ID][t.getID()],
+												z[c.ID]);
 
+							}
 						}
 					}
-				}
 
 			for (Task t : Interface.network.TaskSet)
 				socialWelfare.addTerm(t.getUtility(), y[t.getID()]);
@@ -101,47 +127,49 @@ public class MasterProblemVCG {
 			for (Task t : Interface.network.TaskSet)
 				for (Resource k : Interface.network.ResourceSet) {
 					num_expr = cplex.linearNumExpr();
-					for (Agent a : Interface.network.AgentSet) {
-						if (t.getLocation() == a
-								|| t.getLocation().isNeighbor(a))
-							if (c.getResourceTypeOfConfiguration() == k)
-								num_expr.addTerm(
-										c.varphiAgent[a.getID()][t.getID()],
-										c.z);
-						constraints.add((IloRange) cplex.addGe(
-								num_expr,
-								cplex.prod(y[t.getID()],
-										Req[t.getID()][k.getID()]), "C24"));
-						// ////26
-						for (Agent a2 : Interface.network.AgentSet) {
-							num_expr = cplex.linearNumExpr();
-							if ((t.getLocation() == a2 || t.getLocation()
-									.isNeighbor(a2)) && a != a2)
-								if (c.getResourceTypeOfConfiguration() == k) {
-									num_expr.addTerm(
-											c.varphiAgent[a2.getID()][t.getID()],
-											c.z_N[a.getID()]);
-								}
-						}
-						constraints.add((IloRange) cplex.addGe(
-								num_expr,
-								cplex.prod(y[t.getID()],
-										Req[t.getID()][k.getID()]), "C26"));
+					for (Configuration c : ColumnGenVCG.getInstance().configList)
+						for (Agent a : Interface.network.AgentSet) {
+							if (t.getLocation() == a
+									|| t.getLocation().isNeighbor(a))
+								if (c.getResourceTypeOfConfiguration() == k)
+									num_expr.addTerm(varphiAgent[c.ID][a
+											.getID()][t.getID()], z[c.ID]);
+							constraints.add((IloRange) cplex.addGe(
+									num_expr,
+									cplex.prod(y[t.getID()],
+											Req[t.getID()][k.getID()]), "C24"));
+							// ////26
+							for (Agent a2 : Interface.network.AgentSet) {
+								num_expr = cplex.linearNumExpr();
+								if ((t.getLocation() == a2 || t.getLocation()
+										.isNeighbor(a2)) && a != a2)
+									if (c.getResourceTypeOfConfiguration() == k) {
+										num_expr.addTerm(varphiAgent[c.ID][a2
+												.getID()][t.getID()],
+												z_N[c.ID][a.getID()]);
+									}
+							}
+							constraints.add((IloRange) cplex.addGe(
+									num_expr,
+									cplex.prod(y[t.getID()],
+											Req[t.getID()][k.getID()]), "C26"));
 
-					}
+						}
 				}
 			// ////25
 			for (Resource k : Interface.network.ResourceSet) {
 				for (Agent a : Interface.network.AgentSet) {
 					num_expr = cplex.linearNumExpr();
-					if (c.getResourceTypeOfConfiguration() == k) {
-						for (Task t : Interface.network.TaskSet) {
-							num_expr.addTerm(
-									c.varphiAgent[a.getID()][t.getID()], c.z);
+					for (Configuration c : ColumnGenVCG.instance.configList) {
+						if (c.getResourceTypeOfConfiguration() == k) {
+							for (Task t : Interface.network.TaskSet) {
+								num_expr.addTerm(
+										varphiAgent[c.ID][a.getID()][t.getID()],
+										z[c.ID]);
+							}
+							constraints.add(cplex.addLe(num_expr,
+									c.allocation[a.getID()], "C25"));
 						}
-						constraints.add(cplex.addLe(num_expr,
-								c.allocation[a.getID()], "C25"));
-
 					}
 
 					// ////27

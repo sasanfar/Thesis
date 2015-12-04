@@ -138,18 +138,18 @@ public class PricingProblemVCG {
 		}
 	}
 
-	public void updateReducedCost(Resource resource) {
+	public void updateReducedCost(List<IloRange> constraints) {
 		try {
 			IloLinearNumExpr num_expr = cplex.linearNumExpr();
 
-			for (IloConstraint r : ColumnGenVCG.getInstance().masterproblem.constraints)
-				if (r.getName().equals("C24")) {
+			for (IloRange r : constraints)
+				if (r.getName().contains("C24")) {
 					 //num_expr.add();
-				} else if (r.getName().equals("C25")) {
+				} else if (r.getName().contains("C25")) {
 					// num_expr.add(arg0);
-				} else if (r.getName().equals("C26")) {
+				} else if (r.getName().contains("C26")) {
 					// num_expr.add(arg0);
-				} else if (r.getName().equals("C27")) {
+				} else if (r.getName().contains("C27")) {
 					// num_expr.add(arg0);
 					/*
 					 * } else if (r.getName().equals("C28")) { //
@@ -163,7 +163,7 @@ public class PricingProblemVCG {
 		}
 	}
 
-	public void solve(Resource r) {
+	public void solve() {
 		try {
 			mip_call_back.reset();
 			if (cplex.solve()) {

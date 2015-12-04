@@ -3,8 +3,10 @@ package user_interface;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+
 import Barter.ColumnGenBarter;
 import VCG.ColumnGenVCG;
+import VCGtest.CG_VCG;
 import problem.*;
 
 public class Interface {
@@ -123,8 +125,8 @@ public class Interface {
 			break;
 
 		case "v":
-			ColumnGenVCG columnGenVCG = ColumnGenVCG.getInstance();
-			columnGenVCG.runColumnGenerationVCG();
+			CG_VCG cg = new CG_VCG();
+			cg.runVCG();
 			break;
 
 		default:
