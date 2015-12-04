@@ -8,6 +8,15 @@ public class Configuration {
 	Resource resource;
 	int[] allocation = new int[Interface.network.AgentSet.size()];
 	int ID;
+	/**
+	 * [Agent][Task]
+	 */
+	public Double[][] varphiAgent = new Double[CG_VCG.agentSet.size()][CG_VCG.taskSet.size()];
+	/**
+	 * [Task]
+	 */
+	public Double[] varphi = new Double[CG_VCG.taskSet
+			.size()];
 
 	public int getID() {
 		return ID;

@@ -92,6 +92,8 @@ public class Agent {
 	public void draw(Graphics g) {
 
 		g.setColor(Color.red);
+		
+		g.fillOval((int)(x*10), (int)(y*10), 10, 10);
 		Font f = new Font("Times New Roman (Headings CS)", Font.BOLD, 18);
 
 		g.setFont(f);
@@ -121,5 +123,11 @@ public class Agent {
 
 		g.drawString(resourceString, (int) (x * 10 + 10) + 10,
 				(int) (y * 10 + 27));
+	}
+	
+	public boolean equals(Agent agent){
+		if(this.ID == agent.ID)
+			return true;
+		return false;
 	}
 }

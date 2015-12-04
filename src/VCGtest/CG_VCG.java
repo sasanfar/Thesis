@@ -12,32 +12,39 @@ public class CG_VCG {
 	public static List<Agent> agentSet = Interface.network.AgentSet;
 	public static List<Task> taskSet = Interface.network.TaskSet;
 	public static List<Resource> resourceSet = Interface.network.ResourceSet;
-	
+
 	public static List<Configuration> configurationList = new ArrayList<Configuration>();
 
 	public static void runVCG() {
 		MP_VCG master;
 		PP_VCG pp;
 		int iterator = 0;
-		boolean lastTime=false;
+		boolean lastTime = false;
 		generateFirstConfigurations();
 		do {
 			master = new MP_VCG();
-			master.solve(lastTime);
+			master.solve();
 
 			for (Resource r : resourceSet) {
 				pp = new PP_VCG(r);
-				if (pp.solve())
-					pp.update();
+				pp.solve();
 			}
 
-		} while (iterator<100);
+		} while (iterator < 100);
 
 		master.solveMIP();
 	}
 
 	private static void generateFirstConfigurations() {
-		// TODO Auto-generated method stub
-		
+		for (Resource resource : resourceSet) {
+			Configuration configuration = new Configuration(resource);
+			for (Agent agent : agentSet)
+				configuration.allocation[agent.getID()] = agent
+						.getResourceSetAgent(resource.getID());
+			
+			// add varphi and varphiAgent
+			
+			configurationList.add(configuration);
+		}
 	}
 }
