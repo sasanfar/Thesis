@@ -21,9 +21,4 @@ public class Resource {
 		location=null;
 		//quantity = 0;		
 	}
-	public boolean equals(Resource resource){
-		if(this.ID == resource.ID)
-			return true;
-		return false;
-	}
 }

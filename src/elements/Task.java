@@ -46,9 +46,5 @@ public class Task {
 	public void setLocation(Agent location) {
 		this.location = location;
 	}
-	public boolean equals(Task task){
-		if(this.ID == task.ID)
-			return true;
-		return false;
-	}
+
 }

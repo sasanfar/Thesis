@@ -342,7 +342,7 @@ public class Network implements java.io.Serializable {
 			@Override
 			public void run() {
 				JFrame frame = new JFrame("Generated Network");
-				//frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				Graph panel = new Graph();
 				frame.add(panel, BorderLayout.WEST);
 //				final JPanel p = new JPanel() {

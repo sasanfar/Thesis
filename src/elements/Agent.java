@@ -40,8 +40,8 @@ public class Agent {
 		ResourceSetAgent = new int[_maxNumberResourceTypes];
 
 		Random r = new Random();
-		x = r.nextFloat() * 80 + 5;
-		y = r.nextFloat() * 80 + 5;
+		x = r.nextFloat() * 80;
+		y = r.nextFloat() * 80;
 
 	}
 
@@ -92,9 +92,7 @@ public class Agent {
 	public void draw(Graphics g) {
 
 		g.setColor(Color.red);
-		
-		g.fillOval((int)(x*10), (int)(y*10), 10, 10);
-		Font f = new Font("Times New Roman (Headings CS)", Font.BOLD, 18);
+		Font f = new Font("Times New Roman (Headings CS)", Font.BOLD, 16);
 
 		g.setFont(f);
 		g.drawString("A" + ID, (int) x * 10 + 10, (int) y * 10 + 10);
@@ -108,7 +106,7 @@ public class Agent {
 			taskString = taskString + tmp;
 		}
 
-		g.drawString(taskString, (int) (x * 10 + 20), (int) (y * 10 + 17));
+		g.drawString(taskString, (int) (x * 10 + 20) , (int) (y * 10 + 17));
 
 		// resources
 		g.setColor(Color.blue);
@@ -122,12 +120,6 @@ public class Agent {
 			}
 
 		g.drawString(resourceString, (int) (x * 10 + 10) + 10,
-				(int) (y * 10 + 27));
-	}
-	
-	public boolean equals(Agent agent){
-		if(this.ID == agent.ID)
-			return true;
-		return false;
+				(int) (y * 10 + 27) );
 	}
 }
