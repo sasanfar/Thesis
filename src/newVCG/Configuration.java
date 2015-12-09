@@ -1,4 +1,4 @@
-package VCGtest;
+package newVCG;
 
 import elements.Resource;
 import user_interface.Interface;

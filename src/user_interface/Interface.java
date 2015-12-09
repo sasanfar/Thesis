@@ -4,9 +4,9 @@ import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
+import newVCG.CG_VCG;
 import Barter.ColumnGenBarter;
 import VCG.ColumnGenVCG;
-import VCGtest.CG_VCG;
 import problem.*;
 
 public class Interface {

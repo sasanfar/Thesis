@@ -101,7 +101,7 @@ public class PricingProblemBarter {
 
 		for (IloConstraint r : ColumnGenBarter.getInstance().masterproblem.constraints){
 			if (r.getName().equalsIgnoreCase("IC")) {
-				numExpr.addTerm(coef, var);
+				
 			} else if (r.getName().equalsIgnoreCase("IR")) {
 				// num_expr.add(arg0);
 			} else if (r.getName().equalsIgnoreCase("proba")) {

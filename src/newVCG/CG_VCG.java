@@ -1,4 +1,4 @@
-package VCGtest;
+package newVCG;
 
 import java.util.ArrayList;
 import java.util.List;

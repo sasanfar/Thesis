@@ -1,19 +1,25 @@
-package VCGtest;
+package newVCG;
 
 import ilog.concert.*;
 import ilog.cplex.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import elements.*;
 
 public class MP_VCG {
 
+	public MP_VCG() {
+		dualConstraints = new HashSet<Map<String, Double>>();
+	}
+
 	List<IloRange> constraints = new ArrayList<IloRange>();
-	Map<String, Double> dualConstraints = new HashMap<String, Double>();
+	static Set<Map<String, Double>> dualConstraints;
 
 	// Parameters
 	/**
@@ -200,7 +206,9 @@ public class MP_VCG {
 
 		try {
 			for (IloRange r : constraints) {
-				dualConstraints.put(r.getName(), master.getDual(r));
+				Map<String, Double> d = new HashMap<String, Double>();
+				d.put(r.getName(), master.getDual(r));
+				dualConstraints.add(d);
 			}
 		} catch (IloException e) {
 			// TODO Auto-generated catch block
@@ -219,8 +227,8 @@ public class MP_VCG {
 						Double.MAX_VALUE);
 			z = master.boolVarArray(CG_VCG.configurationList.size());
 			for (Agent a : CG_VCG.agentSet)
-				z_N[a.getID()] = master.boolVarArray(
-						CG_VCG.configurationList.size());
+				z_N[a.getID()] = master.boolVarArray(CG_VCG.configurationList
+						.size());
 			// Objective
 			IloLinearNumExpr objective = master.linearNumExpr();
 			for (Task task : CG_VCG.taskSet)
@@ -292,8 +300,8 @@ public class MP_VCG {
 								numExpr.addTerm(
 										c.varphiAgent[a.getID()][t.getID()],
 										z[c.getID()]);
-					master.addLe(numExpr,
-							a.getResourceSetAgent(r.getID()), "C25");
+					master.addLe(numExpr, a.getResourceSetAgent(r.getID()),
+							"C25");
 
 					// 27
 					for (Agent a2 : CG_VCG.agentSet)

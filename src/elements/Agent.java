@@ -90,30 +90,36 @@ public class Agent {
 	}
 
 	public void draw(Graphics g) {
-
-		g.setColor(Color.red);
+		Graphics2D g2d = (Graphics2D) g;
 		
-		g.fillOval((int)(x*10), (int)(y*10), 10, 10);
+
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                             RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+        
+		g2d.setColor(Color.red);
+
+		g2d.fillOval((int) (x * 10)+5, (int) (y * 10)+5
+				, 9, 9);
 		Font f = new Font("Times New Roman (Headings CS)", Font.BOLD, 18);
 
-		g.setFont(f);
-		g.drawString("A" + ID, (int) x * 10 + 10, (int) y * 10 + 10);
+		g2d.setFont(f);
+		g2d.drawString("A" + ID, (int) x * 10 + 10, (int) y * 10 + 10);
 
 		// tasks
 		f = new Font("Calibri", Font.BOLD, 14);
-		g.setFont(f);
+		g2d.setFont(f);
 		String taskString = " ";
 		for (int i = 0; i < TaskSetAgent.size(); i++) {
 			String tmp = "T" + TaskSetAgent.get(i).getID() + " ";
 			taskString = taskString + tmp;
 		}
 
-		g.drawString(taskString, (int) (x * 10 + 20), (int) (y * 10 + 17));
+		g2d.drawString(taskString, (int) (x * 10 + 20), (int) (y * 10 + 17));
 
 		// resources
-		g.setColor(Color.blue);
+		g2d.setColor(Color.blue);
 		f = new Font("Calibri", Font.BOLD, 14);
-		g.setFont(f);
+		g2d.setFont(f);
 		String resourceString = "";
 		for (int i = 0; i < ResourceSetAgent.length; i++)
 			if (ResourceSetAgent[i] > 0) {
@@ -121,12 +127,12 @@ public class Agent {
 				resourceString = resourceString + tmp;
 			}
 
-		g.drawString(resourceString, (int) (x * 10 + 10) + 10,
+		g2d.drawString(resourceString, (int) (x * 10 + 10) + 10,
 				(int) (y * 10 + 27));
 	}
-	
-	public boolean equals(Agent agent){
-		if(this.ID == agent.ID)
+
+	public boolean equals(Agent agent) {
+		if (this.ID == agent.ID)
 			return true;
 		return false;
 	}
