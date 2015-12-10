@@ -1,7 +1,6 @@
 package elements;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import java.util.Arrays;
 
 public class Task {
 
@@ -50,5 +49,12 @@ public class Task {
 		if(this.ID == task.ID)
 			return true;
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return "Task [ID=" + ID + ", requiredResources="
+				+ Arrays.toString(requiredResources) + ", utility=" + utility
+				+ ", location=" + location + "]";
 	}
 }

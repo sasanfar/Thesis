@@ -10,6 +10,11 @@ import java.util.*;
 import problem.Network;
 
 public class Agent {
+	@Override
+	public String toString() {
+		return "Agent [ID=" + ID + ", x=" + x + ", y=" + y + "]";
+	}
+
 	int ID;
 	int[] ResourceSetAgent;
 	float x, y;

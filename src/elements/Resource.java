@@ -1,6 +1,10 @@
 package elements;
 
 public class Resource {
+	@Override
+	public String toString() {
+		return "Resource [ID=" + ID + "]";
+	}
 	int ID;
 	Agent location;
 

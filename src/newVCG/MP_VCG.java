@@ -14,13 +14,9 @@ import elements.*;
 
 public class MP_VCG {
 
-	public MP_VCG() {
-		dualConstraints = new HashSet<Map<String, Double>>();
-	}
-
 	List<IloRange> constraints = new ArrayList<IloRange>();
-	static Set<Map<String, Double>> dualConstraints;
-
+	double[] dualConstraints;
+	String[] dualConstraintsNames;
 	// Parameters
 	/**
 	 * [Task][Resource]
@@ -96,7 +92,8 @@ public class MP_VCG {
 											z[c.getID()]);
 								}
 					numExpr.addTerm(-Req[t.getID()][r.getID()], y[t.getID()]);
-					constraints.add(master.addGe(numExpr, 0, "C24"));
+					constraints.add(master.addGe(numExpr, 0,
+							"C24" + t.toString() + r.toString()));
 
 					// 26
 					for (Agent agent : CG_VCG.agentSet) {
@@ -115,7 +112,11 @@ public class MP_VCG {
 
 						numExpr.addTerm(-Req[t.getID()][r.getID()],
 								y[t.getID()]);
-						constraints.add(master.addGe(numExpr, 0, "C26"));
+						constraints.add(master.addGe(
+								numExpr,
+								0,
+								"C26" + t.toString() + r.toString()
+										+ agent.toString()));
 					}
 				}
 			}
@@ -131,7 +132,8 @@ public class MP_VCG {
 										c.varphiAgent[a.getID()][t.getID()],
 										z[c.getID()]);
 					constraints.add(master.addLe(numExpr,
-							a.getResourceSetAgent(r.getID()), "C25"));
+							a.getResourceSetAgent(r.getID()),
+							"C25" + a.toString() + r.toString()));
 
 					// 27
 					for (Agent a2 : CG_VCG.agentSet)
@@ -143,8 +145,11 @@ public class MP_VCG {
 										numExpr.addTerm(c.varphiAgent[a2
 												.getID()][t.getID()], z_N[a
 												.getID()][c.getID()]);
-							constraints.add(master.addLe(numExpr,
-									a2.getResourceSetAgent(r.getID()), "C27"));
+							constraints.add(master.addLe(
+									numExpr,
+									a2.getResourceSetAgent(r.getID()),
+									"C27" + a.toString() + a2.toString()
+											+ r.toString()));
 						}
 				}
 			}
@@ -167,7 +172,8 @@ public class MP_VCG {
 						}
 					}
 					numExpr.addTerm(-1, E_N[r.getID()][a.getID()]);
-					constraints.add(master.addLe(0, numExpr, "C28"));
+					constraints.add(master.addLe(0, numExpr,
+							"C28" + a.toString() + r.toString()));
 				}
 			}
 
@@ -178,7 +184,8 @@ public class MP_VCG {
 					if (configuration.getResource().equals(resource))
 						numExpr.addTerm(1, z[configuration.getID()]);
 				}
-				constraints.add(master.addLe(numExpr, 1, "C29"));
+				constraints.add(master.addLe(numExpr, 1,
+						"C29" + resource.toString()));
 				// 30
 				for (Agent agent : CG_VCG.agentSet) {
 					numExpr = master.linearNumExpr();
@@ -187,7 +194,8 @@ public class MP_VCG {
 							numExpr.addTerm(1,
 									z_N[agent.getID()][configuration.getID()]);
 					}
-					constraints.add(master.addLe(numExpr, 1, "C30"));
+					constraints.add(master.addLe(numExpr, 1,
+							"C30" + resource.toString() + agent.toString()));
 				}
 			}
 
@@ -202,17 +210,10 @@ public class MP_VCG {
 		}
 	}
 
-	private void getDuals() {
+	private void getDuals() throws IloException {
 
-		try {
-			for (IloRange r : constraints) {
-				Map<String, Double> d = new HashMap<String, Double>();
-				d.put(r.getName(), master.getDual(r));
-				dualConstraints.add(d);
-			}
-		} catch (IloException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		for (IloRange r : constraints) {
+			r.toString();
 		}
 
 	}
@@ -266,7 +267,8 @@ public class MP_VCG {
 											z[c.getID()]);
 								}
 					numExpr.addTerm(-Req[t.getID()][r.getID()], y[t.getID()]);
-					master.addGe(numExpr, 0, "C24");
+					master.addGe(numExpr, 0,
+							"C24 " + r.toString() + t.toString());
 
 					// 26
 					for (Agent agent : CG_VCG.agentSet) {
@@ -285,7 +287,11 @@ public class MP_VCG {
 
 						numExpr.addTerm(-Req[t.getID()][r.getID()],
 								y[t.getID()]);
-						master.addGe(numExpr, 0, "C26");
+						master.addGe(
+								numExpr,
+								0,
+								"C26 " + t.toString() + r.toString()
+										+ agent.toString());
 					}
 				}
 			}
@@ -301,7 +307,7 @@ public class MP_VCG {
 										c.varphiAgent[a.getID()][t.getID()],
 										z[c.getID()]);
 					master.addLe(numExpr, a.getResourceSetAgent(r.getID()),
-							"C25");
+							"C25" + a.toString() + r.toString());
 
 					// 27
 					for (Agent a2 : CG_VCG.agentSet)
@@ -313,8 +319,11 @@ public class MP_VCG {
 										numExpr.addTerm(c.varphiAgent[a2
 												.getID()][t.getID()], z_N[a
 												.getID()][c.getID()]);
-							master.addLe(numExpr,
-									a2.getResourceSetAgent(r.getID()), "C27");
+							master.addLe(
+									numExpr,
+									a2.getResourceSetAgent(r.getID()),
+									"C27" + a.toString() + a2.toString()
+											+ r.toString());
 						}
 				}
 			}
@@ -337,7 +346,8 @@ public class MP_VCG {
 						}
 					}
 					numExpr.addTerm(-1, E_N[r.getID()][a.getID()]);
-					master.addLe(0, numExpr, "C28");
+					master.addLe(0, numExpr,
+							"C28" + a.toString() + r.toString());
 				}
 			}
 
@@ -348,7 +358,7 @@ public class MP_VCG {
 					if (configuration.getResource().equals(resource))
 						numExpr.addTerm(1, z[configuration.getID()]);
 				}
-				master.addLe(numExpr, 1, "C29");
+				master.addLe(numExpr, 1, "C29" + resource.toString());
 				// 30
 				for (Agent agent : CG_VCG.agentSet) {
 					numExpr = master.linearNumExpr();
@@ -357,7 +367,8 @@ public class MP_VCG {
 							numExpr.addTerm(1,
 									z_N[agent.getID()][configuration.getID()]);
 					}
-					master.addLe(numExpr, 1, "C30");
+					master.addLe(numExpr, 1, "C30" + agent.toString()
+							+ resource.toString());
 				}
 			}
 
@@ -371,5 +382,4 @@ public class MP_VCG {
 			e.printStackTrace();
 		}
 	}
-
 }

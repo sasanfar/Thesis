@@ -17,5 +17,25 @@ public class CG_Barter {
 	public static void runBarter(){
 		MP_Barter master;
 		PP_Barter pp;
+		int iterationCounter = 0;
+		
+		buildFirstOutcome();
+		do {
+			
+			master = new MP_Barter();
+			master.solve();
+			
+			pp = new PP_Barter();
+			pp.solve();
+			
+			iterationCounter++;
+		}while (iterationCounter <100);
+		
+		master.solveMIP();
+	}
+
+	private static void buildFirstOutcome() {
+		// TODO Auto-generated method stub
+		
 	}
 }
