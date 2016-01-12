@@ -11,17 +11,19 @@ import problem.*;
 
 public class Interface {
 	public static Network network = Network.getInstance();
+	public static int _numAgents = 20, _numTasks = 15, _numResourceTypes = 10, _maxEachTypePerAgent = 5,
+			_maxEachTypePerTask = 5;
 
-	public static void main(String[] args) throws FileNotFoundException,
-			UnsupportedEncodingException {
+	public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
 		Scanner keyboard = new Scanner(System.in);
 		boolean execute = true;
-		while (!network.initializeNetwork(20, 15, 10, 5, 5))
+		while (!network.initializeNetwork(_numAgents, _numTasks, _numResourceTypes, _maxEachTypePerAgent,
+				_maxEachTypePerTask))
 			;
 		String command;
 		while (execute) {
-			System.out
-					.println("\"N\" for network related material, \"S\" to solve the problem, \"E\" to exit the program:");
+			System.out.println(
+					"\"N\" for network related material, \"S\" to solve the problem, \"E\" to exit the program:");
 			command = keyboard.nextLine();
 			command = command.toLowerCase();
 			switch (command) {
@@ -45,26 +47,24 @@ public class Interface {
 		}
 	}
 
-	public static void networkInterface(Network network)
-			throws FileNotFoundException, UnsupportedEncodingException {
+	public static void networkInterface(Network network) throws FileNotFoundException, UnsupportedEncodingException {
 		Scanner keyboard = new Scanner(System.in);
 		String command;
-		System.out
-				.println("\"N\" for new network, \"D\" to draw the network, \"P\" to print the network, \"S\" to save current network, \"L\" for loading a network:");
+		System.out.println(
+				"\"N\" for new network, \"D\" to draw the network, \"P\" to print the network, \"S\" to save current network, \"L\" for loading a network:");
 		command = keyboard.nextLine();
 		command = command.toLowerCase();
 		switch (command) {
 		case "n": {
-			System.out
-					.println("Put in number of agents, number of tasks, number of resource types, max of each type per agent, max of each type per task:");
-			int _numAgents, _numTasks, _numResourceTypes, _maxEachTypePerAgent, _maxEachTypePerTask;
+			System.out.println(
+					"Put in number of agents, number of tasks, number of resource types, max of each type per agent, max of each type per task:");
+
 			_numAgents = keyboard.nextInt();
 			_numTasks = keyboard.nextInt();
 			_numResourceTypes = keyboard.nextInt();
 			_maxEachTypePerAgent = keyboard.nextInt();
 			_maxEachTypePerTask = keyboard.nextInt();
-			network = Network.newNetwork(_numAgents, _numTasks,
-					_numResourceTypes, _maxEachTypePerAgent,
+			network = Network.newNetwork(_numAgents, _numTasks, _numResourceTypes, _maxEachTypePerAgent,
 					_maxEachTypePerTask);
 
 		}
@@ -76,7 +76,7 @@ public class Interface {
 		case "d":
 			network.draw();
 			break;
-			
+
 		case "s": {
 			System.out.println("Put in the file directory:");
 			String file = keyboard.nextLine();
@@ -93,14 +93,13 @@ public class Interface {
 			if (Network.loadNetwork(file) != null) {
 				network = Network.getInstance();
 				System.out.println("Loaded successfully...");
-			// mapping(network);
+				// mapping(network);
 			} else {
-				System.out
-						.println("Not loaded, using default values for a new network...");
+				System.out.println("Not loaded, using default values for a new network...");
 				network = Network.getInstance();
 				// network.initializeNetwork(100, 50, 20, 10, 5);
-			// mapping(network);
-			 }
+				// mapping(network);
+			}
 		}
 			break;
 
@@ -113,8 +112,7 @@ public class Interface {
 
 	public static void solveInterface(Network network) {
 		Scanner keyboard = new Scanner(System.in);
-		System.out
-				.println("\"B\" to solve using barter mechanism, \"V\" to solve using VCG mechanism:");
+		System.out.println("\"B\" to solve using barter mechanism, \"V\" to solve using VCG mechanism:");
 		String command;
 		command = keyboard.nextLine();
 		command = command.toLowerCase();
