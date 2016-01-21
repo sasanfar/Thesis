@@ -1,9 +1,12 @@
 package user_interface;
 
+import ilog.concert.IloException;
+
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
+import newBarter.CG_Barter;
 import newVCG.CG_VCG;
 import Barter.ColumnGenBarter;
 import VCG.ColumnGenVCG;
@@ -14,7 +17,7 @@ public class Interface {
 	public static int _numAgents = 20, _numTasks = 15, _numResourceTypes = 10, _maxEachTypePerAgent = 5,
 			_maxEachTypePerTask = 5;
 
-	public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
+	public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException, IloException {
 		Scanner keyboard = new Scanner(System.in);
 		boolean execute = true;
 		while (!network.initializeNetwork(_numAgents, _numTasks, _numResourceTypes, _maxEachTypePerAgent,
@@ -110,7 +113,7 @@ public class Interface {
 		// keyboard.close();
 	}
 
-	public static void solveInterface(Network network) {
+	public static void solveInterface(Network network) throws IloException {
 		Scanner keyboard = new Scanner(System.in);
 		System.out.println("\"B\" to solve using barter mechanism, \"V\" to solve using VCG mechanism:");
 		String command;
@@ -118,8 +121,8 @@ public class Interface {
 		command = command.toLowerCase();
 		switch (command) {
 		case "b":
-			ColumnGenBarter columnGenBarter = ColumnGenBarter.getInstance();
-			columnGenBarter.runColumnGeneration();
+			CG_Barter barter = new CG_Barter();
+			barter.runBarter();
 			break;
 
 		case "v":

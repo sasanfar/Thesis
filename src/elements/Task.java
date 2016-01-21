@@ -2,11 +2,11 @@ package elements;
 
 import java.util.Arrays;
 
-public class Task {
+public class Task implements Comparable<Task>{
 
 	int ID;
-	int[] requiredResources; // array of quantity and type of each resource
-								// in that task
+	int[] requiredResources; // array of required quantity of each resource
+								// for the task
 	int utility;
 	Agent location;
 
@@ -45,8 +45,9 @@ public class Task {
 	public void setLocation(Agent location) {
 		this.location = location;
 	}
-	public boolean equals(Task task){
-		if(this.ID == task.ID)
+
+	public boolean equals(Task task) {
+		if (this.ID == task.ID)
 			return true;
 		return false;
 	}
@@ -56,5 +57,15 @@ public class Task {
 		return "Task [ID=" + ID + ", requiredResources="
 				+ Arrays.toString(requiredResources) + ", utility=" + utility
 				+ ", location=" + location + "]";
+	}
+	
+	@Override
+	public int compareTo(Task t){
+		if (this.utility< t.utility)
+			return -1;
+		else if (this.utility>t.utility)
+			return 1;
+		else 
+			return 0;
 	}
 }
